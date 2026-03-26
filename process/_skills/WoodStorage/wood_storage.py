@@ -171,6 +171,34 @@ class WoodStorage:
         self._save()
         print("[STORAGE] All compartments refilled to capacity")
 
+    def get_wobj(self, category: str) -> str:
+        """Get work object name for a beam category.
+
+        Args:
+            category: Beam category ("small" or "large")
+
+        Returns:
+            Work object name (e.g. "ob_HSLU_Pick_small")
+        """
+        for compartment in self.data["compartments"].values():
+            if compartment["category"] == category:
+                return compartment["wobj"]
+        raise ValueError(f"Unknown category: {category}")
+
+    def get_extax(self, category: str) -> float:
+        """Get external axis (track) position for a beam category.
+
+        Args:
+            category: Beam category ("small" or "large")
+
+        Returns:
+            Track position in mm
+        """
+        for compartment in self.data["compartments"].values():
+            if compartment["category"] == category:
+                return compartment["extax"]
+        raise ValueError(f"Unknown category: {category}")
+
     def get_status(self) -> dict:
         """Get overview of all compartments.
 
