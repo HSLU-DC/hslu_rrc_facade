@@ -1,0 +1,266 @@
+{
+  "layers": [
+    {
+      "id": 0,
+      "elements": [
+        {
+          "id": 0,
+          "beam_size": "small",
+          "place_position": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [200.0, 100.0, 40.0],
+              "xaxis": [1.0, 0.0, 0.0],
+              "yaxis": [0.0, 1.0, 0.0]
+            }
+          },
+          "cut_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, -50.0, -20.0],
+              "xaxis": [0.9659, 0.2588, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "cut_position_b": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, 350.0, -20.0],
+              "xaxis": [0.9659, -0.2588, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "glue_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [100.0, 50.0, -30.0],
+              "xaxis": [1.0, 0.0, 0.0],
+              "yaxis": [0.0, 1.0, 0.0]
+            }
+          },
+          "glue_position_b": null
+        },
+        {
+          "id": 1,
+          "beam_size": "small",
+          "place_position": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [600.0, 100.0, 40.0],
+              "xaxis": [1.0, 0.0, 0.0],
+              "yaxis": [0.0, 1.0, 0.0]
+            }
+          },
+          "cut_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, -50.0, -20.0],
+              "xaxis": [1.0, 0.0, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "cut_position_b": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, 350.0, -20.0],
+              "xaxis": [1.0, 0.0, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "glue_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [100.0, 50.0, -30.0],
+              "xaxis": [1.0, 0.0, 0.0],
+              "yaxis": [0.0, 1.0, 0.0]
+            }
+          },
+          "glue_position_b": null
+        },
+        {
+          "id": 2,
+          "beam_size": "large",
+          "place_position": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [1000.0, 50.0, 40.0],
+              "xaxis": [0.7071, 0.7071, 0.0],
+              "yaxis": [-0.7071, 0.7071, 0.0]
+            }
+          },
+          "cut_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, -200.0, -20.0],
+              "xaxis": [0.8660, 0.5, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "cut_position_b": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, 700.0, -20.0],
+              "xaxis": [0.8660, -0.5, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "glue_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [100.0, -100.0, -30.0],
+              "xaxis": [0.7071, 0.7071, 0.0],
+              "yaxis": [-0.7071, 0.7071, 0.0]
+            }
+          },
+          "glue_position_b": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [100.0, 500.0, -30.0],
+              "xaxis": [0.7071, 0.7071, 0.0],
+              "yaxis": [-0.7071, 0.7071, 0.0]
+            }
+          }
+        },
+        {
+          "id": 3,
+          "beam_size": "small",
+          "place_position": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [1400.0, 300.0, 40.0],
+              "xaxis": [-1.0, 0.0, 0.0],
+              "yaxis": [0.0, -1.0, 0.0]
+            }
+          },
+          "cut_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, -50.0, -20.0],
+              "xaxis": [0.9848, 0.1736, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "cut_position_b": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, 350.0, -20.0],
+              "xaxis": [0.9848, -0.1736, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "glue_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [100.0, 50.0, -30.0],
+              "xaxis": [-1.0, 0.0, 0.0],
+              "yaxis": [0.0, -1.0, 0.0]
+            }
+          },
+          "glue_position_b": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [100.0, 250.0, -30.0],
+              "xaxis": [-1.0, 0.0, 0.0],
+              "yaxis": [0.0, -1.0, 0.0]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "elements": [
+        {
+          "id": 0,
+          "beam_size": "large",
+          "place_position": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [400.0, 200.0, 65.0],
+              "xaxis": [0.0, 1.0, 0.0],
+              "yaxis": [-1.0, 0.0, 0.0]
+            }
+          },
+          "cut_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, -300.0, -20.0],
+              "xaxis": [1.0, 0.0, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "cut_position_b": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, 700.0, -20.0],
+              "xaxis": [1.0, 0.0, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "glue_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [100.0, -200.0, -30.0],
+              "xaxis": [0.0, 1.0, 0.0],
+              "yaxis": [-1.0, 0.0, 0.0]
+            }
+          },
+          "glue_position_b": null
+        },
+        {
+          "id": 1,
+          "beam_size": "large",
+          "place_position": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [1200.0, 300.0, 65.0],
+              "xaxis": [0.0, -1.0, 0.0],
+              "yaxis": [1.0, 0.0, 0.0]
+            }
+          },
+          "cut_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, -300.0, -20.0],
+              "xaxis": [0.9659, 0.2588, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "cut_position_b": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [50.0, 700.0, -20.0],
+              "xaxis": [0.9659, -0.2588, 0.0],
+              "yaxis": [0.0, 0.0, 1.0]
+            }
+          },
+          "glue_position_a": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [100.0, -200.0, -30.0],
+              "xaxis": [0.0, -1.0, 0.0],
+              "yaxis": [1.0, 0.0, 0.0]
+            }
+          },
+          "glue_position_b": {
+            "dtype": "compas.geometry/Frame",
+            "data": {
+              "point": [100.0, 500.0, -30.0],
+              "xaxis": [0.0, -1.0, 0.0],
+              "yaxis": [1.0, 0.0, 0.0]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "created": "2026-03-26T12:00:00.000000",
+    "layer_count": 2,
+    "total_element_count": 6,
+    "version": "3.0",
+    "project": "facade",
+    "frame_size": [600, 2500],
+    "beam_section": 25
+  }
+}
