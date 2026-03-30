@@ -9,34 +9,61 @@ Based on the Swissbau26 project (`C:\Users\jurij\Documents\GitHub\hslu_rrc_Swiss
 ## Architecture
 
 ```
-grasshopper/
-  export_fab_data.py     # GHPython: Rhino Planes → COMPAS Frames → JSON
+STUDENT_INPUT.md             # Detailed student input specification with images
+README.md                    # Student-facing overview
 
-process/
-  production.py          # Main loop: Pick → Cut → Glue → Place
-  validate.py            # Pre-flight validation (run before any robot motion)
-  globals.py             # Speeds, tools, workobjects, frame dimensions
-  joint_positions.py     # Taught joint targets per station
+design/
+  hslu_rrc_facade.ghx        # GH template: export, validation, IK visualization
+  hslu_rrc_facade.3dm        # Rhino file (not in git, too large)
 
-  _skills/               # Low-level robot capabilities (DO NOT MODIFY for students)
-    custom_motion.py     # Güdel track coordinated motion (MoveToJoints, MoveToRobtarget)
-    fabdata.py           # JSON data loading (compas.json_load), v3 layer structure
-    gripper.py           # Open/close via RAPID custom instructions
-    GlueLine/            # All-in-one glue line execution in RAPID (avoids Python latency)
-    GluePLC/             # PLC safety handshake for glue system
-    SoftAct/             # Compliant servo for soft gripping/pressing
-    WoodStorage/         # Inventory management (small/large categories, round-robin pick)
+docs/
+  images/                    # Documentation images
 
-  stations/              # Station implementations (DO NOT MODIFY for students)
-    a_pick_station.py    # CSS grip from dynamic storage
-    b_cut_station.py     # Dual 1D miter cuts (no Schifterschnitte)
-    d_glue_station.py    # POS/NEG auto-dispatch, predefined glue path
-    e_place_station.py   # Dynamic track offset, approach computed from place_position
+docker/
+  REAL-docker-compose.yml    # ROS + ABB driver (real controller)
+  VIRTUAL-docker-compose.yml # ROS + ABB driver (virtual controller)
+
+process/                     # (Work in Progress)
+  production.py              # Main loop: Pick → Cut → Glue → Place
+  validate.py                # Pre-flight validation (run before any robot motion)
+  globals.py                 # Speeds, tools, workobjects, frame dimensions
+  joint_positions.py         # Taught joint targets per station
+
+  _skills/                   # Low-level robot capabilities (DO NOT MODIFY for students)
+    custom_motion.py         # Güdel track coordinated motion (MoveToJoints, MoveToRobtarget)
+    fabdata.py               # JSON data loading (compas.json_load), v3 layer structure
+    gripper.py               # Open/close via RAPID custom instructions
+    GlueLine/                # All-in-one glue line execution in RAPID (avoids Python latency)
+    GluePLC/                 # PLC safety handshake for glue system
+    SoftAct/                 # Compliant servo for soft gripping/pressing
+    WoodStorage/             # Inventory management (small/large categories, round-robin pick)
+
+  stations/                  # Station implementations (DO NOT MODIFY for students)
+    a_pick_station.py        # CSS grip from dynamic storage
+    b_cut_station.py         # Dual 1D miter cuts (no Schifterschnitte)
+    d_glue_station.py        # POS/NEG auto-dispatch, predefined glue path
+    e_place_station.py       # Dynamic track offset, approach computed from place_position
 
   data/
-    fab_data.json        # Student export (from GH)
-    wood_storage.json    # Inventory state (persisted between runs)
+    fab_data.json            # Student export (from GH)
+    wood_storage.json        # Inventory state (persisted between runs)
 ```
+
+## Student Input (GH)
+Students provide per element in `ob_HSLU_Place` world coordinates:
+
+| Index | Name | Type | Description |
+|-------|------|------|-------------|
+| 0 | Brep | Brep | Finished beam geometry (25x25mm, with miter cuts) |
+| 1 | Centerline | Line | Center axis of the finished beam |
+| 2 | Cut Plane A | Plane | Cut plane end A (Z outward, Y world-up) |
+| 3 | Cut Plane B | Plane | Cut plane end B (Z outward, Y world-up) |
+| 4 | Glue Plane A | Plane | Glue plane 1 (Z down, X toward beam center) |
+| 5 | Glue Plane B | Plane | Glue plane 2 (optional) |
+
+GH template automatically computes: beam_size, place_position, robot frames in station workobjects.
+
+Frame bounds: X = 0..2500mm, Y = -600..0mm. Origin = top-left of frame.
 
 ## Key Differences from Swissbau26
 - No label station (c_lable_station removed)
@@ -46,6 +73,7 @@ process/
 - Place station computes approach frames from place_position only (students don't provide pre-app, app, rot frames)
 - Glue: student provides plane, robot drives predefined path pattern
 - JSON has 6 fields per element (not 13)
+- Students provide raw geometry (Brep, Centerline, Planes), GH transforms to robot frames
 
 ## Data Format (v3 Facade)
 ```json
@@ -95,13 +123,13 @@ ros.terminate()
 - `ob_HSLU_Pick_small` / `ob_HSLU_Pick_large` — Pick station (defined in wood_storage.json)
 - `ob_HSLU_Cut` — Cut station
 - `ob_HSLU_Glue` — Glue station
-- `ob_HSLU_Place` — Place station (OFFSET_TRACK = 593mm)
+- `ob_HSLU_Place` — Place station (= World coordinate system, OFFSET_TRACK = 593mm)
 
 ## Development Commands
 ```bash
-# Docker
-cd docker && docker compose up -d        # Start ROS + ABB driver
-cd docker && docker compose down          # Stop
+# Docker (use REAL or VIRTUAL compose file)
+cd docker && docker compose -f REAL-docker-compose.yml up -d
+cd docker && docker compose -f REAL-docker-compose.yml down
 
 # Test connection
 cd process && python scripts/test_connection.py
@@ -118,20 +146,20 @@ cd process && python production.py
 
 ## Validation
 Two-stage validation prevents crashes:
-1. **GH Export** (`export_fab_data.py`): warns about missing fields, bounds violations
-2. **Python** (`validate.py`): hard stop before robot motion — checks format, bounds, cut angles, beam lengths, orientations
+1. **GH Template** (validate component): visual feedback (green/orange/red) for missing data, bounds, cut angles. IK visualization shows reachability.
+2. **Python** (`validate.py`): hard stop before robot motion — checks format, bounds, cut angles, orientations
 
 ## Student Constraints
-- Frame: 600mm (Y) × 2500mm (X)
+- Frame: X = 0..2500mm, Y = -600..0mm
 - Max 2 layers
-- Only 1D miter cuts (Gehrungsschnitte)
-- beam_size: "small" or "large" only
+- Only 1D miter cuts (Gehrungsschnitte), no Schifterschnitte
+- beam_size: automatically determined from centerline length
 - 1-2 glue planes per element
 - Students must NOT modify `_skills/` or `stations/`
 
 ## Known TODOs
 - Joint positions need teaching at the machine (search for `TODO: verify`)
 - Wood storage base_frame Z values need verification for 25mm cross-section
-- MAX_BEAM_LENGTH values in validate.py need verification with actual stock
 - Place station dynamic offset may need recalibration for facade frame
-- GH template (.gh file) needs to be created in Grasshopper
+- beam_size threshold (small vs large) needs to be defined based on actual stock lengths
+- process/ code is WIP — stations need testing on real hardware
