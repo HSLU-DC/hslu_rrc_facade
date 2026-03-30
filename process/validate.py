@@ -70,21 +70,6 @@ def _vector_angle_from_xy_plane(vec):
     return math.degrees(math.asin(abs(vec.z) / vec.length))
 
 
-def _estimate_beam_length(element):
-    """Estimate beam length from place_position and cut positions.
-
-    Uses distance between cut positions as an approximation.
-    Returns None if frames are missing.
-    """
-    cut_a = element.get("cut_position_a")
-    cut_b = element.get("cut_position_b")
-    if not _is_valid_frame(cut_a) or not _is_valid_frame(cut_b):
-        return None
-
-    dx = cut_a.point.x - cut_b.point.x
-    dy = cut_a.point.y - cut_b.point.y
-    dz = cut_a.point.z - cut_b.point.z
-    return math.sqrt(dx*dx + dy*dy + dz*dz)
 
 
 # ==============================================================================
@@ -173,8 +158,8 @@ def check_beam_size(element, layer_idx, elem_idx):
 def check_cut_angles(element, layer_idx, elem_idx):
     """Check that cut planes are 1D (no Schifterschnitte).
 
-    A 1D miter cut has its cut plane normal in the XY plane (Z component ~ 0).
-    The cut frame's zaxis represents the cut plane normal.
+    For a valid 1D cut, the cut frame Z-axis must point straight down (0, 0, -1).
+    Any deviation means the cut plane is tilted = Schifterschnitt.
     """
     errors = []
     prefix = f"Layer {layer_idx}, Element {elem_idx}"
@@ -184,16 +169,23 @@ def check_cut_angles(element, layer_idx, elem_idx):
         if not _is_valid_frame(frame):
             continue
 
-        # The cut plane normal is the z-axis of the cut frame
+        # The Z-axis of the cut frame should point down (0, 0, -1)
         z = frame.xaxis.cross(frame.yaxis)
-        angle_from_xy = _vector_angle_from_xy_plane(z)
+        if z.length > 1e-6:
+            z_normalized = [z.x / z.length, z.y / z.length, z.z / z.length]
+        else:
+            continue
 
-        # For a 1D cut, the normal should be in the XY plane (angle ~ 0 from XY)
-        # Allow some tolerance for numerical precision
-        if angle_from_xy > 5:  # More than 5 degrees out of XY = suspicious
+        # Angle between Z-axis and (0, 0, -1)
+        # dot product with (0,0,-1) = -z_normalized[2]
+        dot_down = -z_normalized[2]
+        # dot_down = 1.0 means perfect downward, < 1.0 means tilted
+        angle_from_down = math.degrees(math.acos(max(-1, min(1, dot_down))))
+
+        if angle_from_down > 5:  # More than 5 degrees from straight down
             errors.append(
                 f"{prefix}: {field} hat einen Schifterschnitt-Winkel "
-                f"(Z-Komponente der Schnittnormale: {angle_from_xy:.1f} Grad). "
+                f"(Z-Achse weicht {angle_from_down:.1f} Grad von der Vertikalen ab). "
                 f"Nur Gehrungsschnitte (1D) sind erlaubt!"
             )
 
@@ -217,43 +209,15 @@ def check_frame_bounds(element, layer_idx, elem_idx):
             f"des Rahmens (0 - {FRAME_LENGTH}mm)"
         )
 
-    if y < -BOUNDS_TOLERANCE or y > FRAME_WIDTH + BOUNDS_TOLERANCE:
+    if y < -(FRAME_WIDTH + BOUNDS_TOLERANCE) or y > BOUNDS_TOLERANCE:
         errors.append(
             f"{prefix}: place_position Y={y:.1f}mm liegt ausserhalb "
-            f"des Rahmens (0 - {FRAME_WIDTH}mm)"
+            f"des Rahmens (-{FRAME_WIDTH} - 0mm)"
         )
 
     return errors
 
 
-def check_element_length(element, layer_idx, elem_idx):
-    """Check that element length fits within stock size limits."""
-    errors = []
-    prefix = f"Layer {layer_idx}, Element {elem_idx}"
-
-    beam_size = element.get("beam_size", "")
-    if isinstance(beam_size, str):
-        beam_size = beam_size.strip('"').strip("'")
-
-    length = _estimate_beam_length(element)
-    if length is None:
-        return errors
-
-    if beam_size in MAX_BEAM_LENGTH:
-        max_len = MAX_BEAM_LENGTH[beam_size]
-        if length > max_len:
-            errors.append(
-                f"{prefix}: Element ist {length:.0f}mm lang, aber "
-                f"beam_size '{beam_size}' erlaubt max {max_len}mm"
-            )
-
-    if length < MIN_BEAM_LENGTH:
-        errors.append(
-            f"{prefix}: Element ist nur {length:.0f}mm lang "
-            f"(Minimum: {MIN_BEAM_LENGTH}mm)"
-        )
-
-    return errors
 
 
 def check_glue_planes(element, layer_idx, elem_idx):
@@ -293,7 +257,6 @@ def validate_element(element, layer_idx, elem_idx):
     errors.extend(check_beam_size(element, layer_idx, elem_idx))
     errors.extend(check_cut_angles(element, layer_idx, elem_idx))
     errors.extend(check_frame_bounds(element, layer_idx, elem_idx))
-    errors.extend(check_element_length(element, layer_idx, elem_idx))
     errors.extend(check_glue_planes(element, layer_idx, elem_idx))
     return errors
 

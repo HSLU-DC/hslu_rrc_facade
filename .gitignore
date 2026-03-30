@@ -24,8 +24,8 @@ ENV/
 Thumbs.db
 desktop.ini
 
-# Rhino/Grasshopper backups
-*.ghx
+# Rhino/Grasshopper
+*.3dm
 *.3dmbak
 *.rhl
 

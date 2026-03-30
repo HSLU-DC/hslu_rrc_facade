@@ -2,6 +2,10 @@
 
 Robotische Produktion von parametrischen Fassadenelementen mit dem ABB Gofa CRB 15000.
 
+> **Hinweis:** Der `process/` Ordner (Python/Roboter-Steuerung) ist aktuell noch **Work in Progress**. Der Grasshopper-Workflow und die Input-Spezifikation sind bereit.
+
+<img src="docs/images/00_anlage.jpeg" width="600">
+
 ## Übersicht
 
 Ihr designt in Grasshopper ein parametrisches Fassadenelement aus 25x25mm Holzlatten,
@@ -20,38 +24,48 @@ das robotisch auf einen Grundrahmen (600 x 2500mm, 40x40mm) platziert wird.
 
 ## Was ihr liefern müsst
 
-Aus Grasshopper müsst ihr folgende Daten exportieren:
+Ihr liefert pro Element **5-6 Geometrien** als Grasshopper DataTree mit `{Layer;Element}` Struktur:
 
-| # | Daten | Typ | Beschreibung |
-|---|-------|-----|-------------|
-| 0 | `place_position` | Plane | Wo das Holz auf dem Rahmen platziert wird (in `ob_HSLU_Place` Koordinaten) |
-| 1 | `cut_position_a` | Plane | Schnittposition Ende A (in `ob_HSLU_Cut` Koordinaten) |
-| 2 | `cut_position_b` | Plane | Schnittposition Ende B (in `ob_HSLU_Cut` Koordinaten) |
-| 3 | `glue_position_a` | Plane | Leimposition 1 (in `ob_HSLU_Glue` Koordinaten) |
-| 4 | `glue_position_b` | Plane | Leimposition 2 (optional, kann leer sein) |
-| 5 | `beam_size` | String | `"small"` oder `"large"` (Holzlänge-Kategorie) |
+| Index | Name | Typ | Beschreibung |
+|-------|------|-----|-------------|
+| 0 | Brep | Brep | Fertige Balkengeometrie (25x25mm, mit Gehrung) |
+| 1 | Centerline | Line | Mittelachse des fertigen Balkens |
+| 2 | Cut Plane A | Plane | Schnittebene Ende A |
+| 3 | Cut Plane B | Plane | Schnittebene Ende B |
+| 4 | Glue Plane A | Plane | Leimebene 1 (Unterseite, am Rand) |
+| 5 | Glue Plane B | Plane | Leimebene 2 (optional) |
 
-Diese Daten werden als **DataTree** mit `{Layer;Element}` Pfad-Struktur organisiert.
+Alles im **Weltkoordinatensystem** von Rhino (= `ob_HSLU_Place`). Origin liegt oben links am Rahmen.
+
+Die detaillierte Spezifikation mit Bildern findet ihr unter **[`STUDENT_INPUT.md`](STUDENT_INPUT.md)**.
+
+<img src="docs/images/01_rhino_gh_anlage.png" width="600">
+
+Folgendes wird automatisch berechnet:
+- **beam_size** (aus Centerline-Länge)
+- **place_position** (aus Centerline)
+- **Roboter-Positionen** (Transformation in die jeweiligen Workobjects)
 
 ## Constraints / Einschränkungen
 
-**Unbedingt beachten:**
-
-- **Rahmen:** 600mm (Y) x 2500mm (X) - alle Elemente müssen innerhalb liegen
-- **Max. 2 Layer** (Layer 0 und Layer 1)
-- **Holzquerschnitt:** 25 x 25mm
-- **Nur Gehrungsschnitte** (1D) - keine Schifterschnitte (2D)!
-- **beam_size:** nur `"small"` oder `"large"` - bestimmt welches Holz aus dem Lager geholt wird
-- **1-2 Leimpunkte** pro Element (mindestens `glue_position_a`)
-- **Platzierungsreihenfolge** = Reihenfolge im DataTree (ihr bestimmt die Sequenz)
+| Constraint | Wert |
+|-----------|------|
+| Rahmengrösse | X: 0 - 2500mm, Y: 0 - -600mm |
+| Balkenquerschnitt | 25 x 25mm |
+| Maximale Anzahl Layer | 2 (Layer 0 und Layer 1) |
+| Schnitttyp | Nur Gehrungsschnitte (1D), keine Schifterschnitte |
+| Leimebenen pro Element | 1 - 2 |
+| Platzierungsreihenfolge | = Reihenfolge im DataTree |
 
 ## Workflow
+
+<img src="docs/images/02_gh_script.png" width="600">
 
 ### 1. Design in Grasshopper
 
 1. Öffne das GH-Template (`grasshopper/hslu_rrc_facade.gh`)
-2. Verbinde eure Geometrie mit den Inputs
-3. Prüfe die Validierung (grün = OK, rot = Fehler)
+2. Verbinde eure Geometrie mit den Inputs (siehe [`STUDENT_INPUT.md`](STUDENT_INPUT.md))
+3. Prüfe visuell die Roboterdarstellung (Inverse Kinematics) - sind die Positionen erreichbar?
 4. Exportiere die Daten (Button `update = True`)
 
 ### 2. JSON prüfen
@@ -90,53 +104,48 @@ DO_GLUE  = True
 DO_PLACE = True
 ```
 
-## Datenformat (JSON)
+## Requirements
 
-```json
-{
-  "layers": [
-    {
-      "id": 0,
-      "elements": [
-        {
-          "id": 0,
-          "beam_size": "small",
-          "cut_position_a": { COMPAS Frame },
-          "cut_position_b": { COMPAS Frame },
-          "glue_position_a": { COMPAS Frame },
-          "glue_position_b": { COMPAS Frame oder null },
-          "place_position": { COMPAS Frame }
-        }
-      ]
-    }
-  ],
-  "metadata": {
-    "version": "3.0",
-    "project": "facade",
-    "frame_size": [600, 2500],
-    "beam_section": 25
-  }
-}
-```
+### Design (bei euch)
+
+- Rhino 8
+- Grasshopper (in Rhino 8 integriert)
+- [Robot Components](https://github.com/RobotComponents/RobotComponents) **v4.1.0** (GH Plugin, via Package Manager installieren)
+
+### Produktion (wird zur Verfügung gestellt)
+
+> Der Produktions-PC/Laptop an der Anlage ist bereits vollständig eingerichtet.
+> Ihr müsst diese Software **nicht** auf euren Rechnern installieren.
+
+- Python 3.13 (Anaconda)
+- [COMPAS](https://compas.dev/) v2.10
+- [compas_rrc](https://github.com/compas-rrc/compas_rrc)
+- [compas_fab](https://github.com/compas-rrc/compas_fab)
+- Docker Desktop (ROS + ABB Driver)
 
 ## Projektstruktur
 
 ```
 hslu_rrc_facade/
+├── README.md                    # Diese Datei
+├── STUDENT_INPUT.md             # Detaillierte Input-Spezifikation
+├── docs/
+│   └── images/                  # Bilder zur Dokumentation
 ├── docker/
 │   └── docker-compose.yml       # ROS + ABB Driver
 ├── grasshopper/
 │   ├── hslu_rrc_facade.gh       # GH Template
-│   └── export_fab_data.py       # GH Python Export-Script
-├── process/
+│   ├── export_fab_data.py       # GH Python Export-Script
+│   └── validate_fab_data.py     # GH Python Validierung
+├── process/                     # (Work in Progress)
 │   ├── production.py            # Hauptskript
 │   ├── validate.py              # Daten-Validierung
 │   ├── globals.py               # Konfiguration
 │   ├── data/
 │   │   ├── fab_data.json        # Euer Export (aus GH)
 │   │   └── wood_storage.json    # Holzlager-Inventar
-│   ├── _skills/                 # Robot-Skills (nicht verändern!)
-│   └── stations/                # Station-Code (nicht verändern!)
+│   ├── _skills/                 # Robot-Skills (NICHT verändern!)
+│   └── stations/                # Station-Code (NICHT verändern!)
 └── design/                      # Eure Design-Dateien
 ```
 
@@ -146,12 +155,12 @@ hslu_rrc_facade/
 
 | Problem | Lösung |
 |---------|--------|
+| Roboter in GH zeigt unrealistische Pose | Geometrie anpassen, Position ist nicht erreichbar |
 | `validate.py` zeigt Fehler | Daten in GH korrigieren und neu exportieren |
 | "Nicht genug Holz" | Holzlager physisch auffüllen, Script fragt danach |
 | Docker-Fehler | `docker compose down && docker compose up -d` |
 | Roboter antwortet nicht | Prüfe ob Controller eingeschaltet und im AUTO-Modus |
-| "beam_size ungültig" | Nur `"small"` oder `"large"` verwenden |
 
 ## Kontakt
 
-Bei Problemen: Jurij kontaktieren.
+Bei Problemen: Juri - juri.jerg@hslu.ch kontaktieren.
