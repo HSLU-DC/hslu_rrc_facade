@@ -18,6 +18,7 @@ from compas.geometry import Frame, Vector, Rotation
 import _skills.custom_motion as cm
 from _skills.fabdata import load_data, get_element
 from _skills.gripper import gripper_open
+from _skills.SimBeam import sim_beam_release
 
 from globals import (
     ROBOT_NAME, TOOL_GRIPPER,
@@ -137,7 +138,7 @@ def create_intermediate_frames(place_frame, sign, offset):
 # Station
 # ==============================================================================
 
-def e_place_station(r1, data, i, *, layer_idx=0, dry_run=False):
+def e_place_station(r1, data, i, *, layer_idx=0, dry_run=False, sim_beams=False):
     """Place beam at target position on facade frame.
 
     The student provides only place_position. All intermediate frames
@@ -216,6 +217,10 @@ def e_place_station(r1, data, i, *, layer_idx=0, dry_run=False):
 
     # Release
     gripper_open(r1, dry_run=dry_run, wait=True)
+
+    # Detach beam geometry in simulation (stays at place position)
+    if sim_beams:
+        sim_beam_release(r1, dry_run=dry_run)
 
     # Deactivate gripper load
     r1.send_and_wait(rrc.CustomInstruction('r_RRC_CI_GripLoad', ['Off'], []))

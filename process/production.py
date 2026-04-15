@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import compas_rrc as rrc
 
 from _skills.fabdata import load_data, has_layers, get_layer_count, get_element_count, get_element
+from _skills.SimBeam import sim_beam_reset
 from _skills.WoodStorage.wood_storage import WoodStorage
 from globals import ROBOT_NAME, TOOL_GRIPPER, MAX_LAYERS
 import _skills.custom_motion as cm
@@ -33,12 +34,13 @@ DO_CUT   = True
 DO_GLUE  = True
 DO_PLACE = True
 
-CSS_ENABLED = True            # Soft Servo (CSS) for compliant gripping
+CSS_ENABLED = True           # Soft Servo (CSS) for compliant gripping
 SAW_ENABLED = True            # Saw on/off control
 GLUE_VALVE_ENABLED = True     # Glue valve on/off control
+SIM_BEAMS = True             # Beam visualization in RobotStudio (virtual only)
 
 LAYER    = 0      # Layer index (0 or 1)
-N_RUNS   = 1      # Number of elements to produce per run
+N_RUNS   = 10      # Number of elements to produce per run
 START_I  = 0      # Start element index
 
 
@@ -174,6 +176,10 @@ def main(*, dry_run=False):
         print("Connected.")
         r1.send(rrc.SetTool(TOOL_GRIPPER))
 
+        # Clear any beams from previous run so the facade starts empty
+        if SIM_BEAMS:
+            sim_beam_reset(r1)
+
     # ==============================
     # 4. Production Loop
     # ==============================
@@ -186,11 +192,11 @@ def main(*, dry_run=False):
 
         if DO_PICK:
             print("\n--- PICK ---")
-            a_pick_station.a_pick_station(r1, DATA, i, layer_idx=LAYER, dry_run=dry_run, css_enabled=CSS_ENABLED)
+            a_pick_station.a_pick_station(r1, DATA, i, layer_idx=LAYER, dry_run=dry_run, css_enabled=CSS_ENABLED, sim_beams=SIM_BEAMS)
 
         if DO_CUT:
             print("\n--- CUT ---")
-            b_cut_station.b_cut_station(r1, DATA, i, layer_idx=LAYER, dry_run=dry_run, saw_enabled=SAW_ENABLED)
+            b_cut_station.b_cut_station(r1, DATA, i, layer_idx=LAYER, dry_run=dry_run, saw_enabled=SAW_ENABLED, sim_beams=SIM_BEAMS)
 
         if DO_GLUE:
             print("\n--- GLUE ---")
@@ -198,7 +204,7 @@ def main(*, dry_run=False):
 
         if DO_PLACE:
             print("\n--- PLACE ---")
-            e_place_station.e_place_station(r1, DATA, i, layer_idx=LAYER, dry_run=dry_run)
+            e_place_station.e_place_station(r1, DATA, i, layer_idx=LAYER, dry_run=dry_run, sim_beams=SIM_BEAMS)
 
     # ==============================
     # 5. Cleanup

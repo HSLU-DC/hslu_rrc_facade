@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<lc:LibraryCompiler xmlns:lc="urn:abb-robotics-robotstudio-librarycompiler"
+                    xmlns="urn:abb-robotics-robotstudio-graphiccomponent">
+  <lc:Library fileName="BeamSimulator.rslib">
+    <lc:DocumentProperties>
+      <lc:Author>HSLU_RRC</lc:Author>
+      <lc:Comments>Dynamic beam geometry visualization for facade production simulation</lc:Comments>
+    </lc:DocumentProperties>
+    <SmartComponent name="BeamSimulator"
+                    codeBehind="BeamSimulator.BeamSimulatorCodeBehind,BeamSimulator.dll"
+                    canBeSimulated="true">
+      <!-- Properties -->
+      <Properties>
+        <DynamicProperty name="GeometryFolder" valueType="System.String" value="" />
+        <DynamicProperty name="MetadataFile" valueType="System.String" value="sim_metadata.json" />
+        <DynamicProperty name="MechanismName" valueType="System.String" value="" />
+        <DynamicProperty name="ToolName" valueType="System.String" value="t_HSLU_GripperZimmer" />
+      </Properties>
+
+      <!-- Signals: Input = SC receives from RAPID, Output = SC sends to RAPID -->
+      <Signals>
+        <IOSignal name="ElementID" signalType="DigitalGroupInput" value="0" />
+        <IOSignal name="LayerID" signalType="DigitalGroupInput" value="0" />
+        <IOSignal name="Activate" signalType="DigitalInput" value="0" />
+        <IOSignal name="SwapCutA" signalType="DigitalInput" value="0" />
+        <IOSignal name="SwapCutB" signalType="DigitalInput" value="0" />
+        <IOSignal name="Release" signalType="DigitalInput" value="0" />
+        <IOSignal name="Reset" signalType="DigitalInput" value="0" />
+      </Signals>
+
+      <!-- Embedded DLL -->
+      <Assets>
+        <Asset source="BeamSimulator.dll" />
+      </Assets>
+    </SmartComponent>
+  </lc:Library>
+</lc:LibraryCompiler>

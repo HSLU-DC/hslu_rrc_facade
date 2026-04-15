@@ -34,3 +34,16 @@ docker/data/
 
 # Claude
 .claude/
+
+# C# / .NET build output (BeamSimulator SmartComponent)
+bin/
+obj/
+*.dll
+*.pdb
+*.rslib
+
+# RobotStudio VC backups
+robotstudio/backup/
+
+# Runtime-generated STL geometry
+process/data/geometry/

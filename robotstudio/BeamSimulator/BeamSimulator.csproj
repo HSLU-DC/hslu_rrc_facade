@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <RootNamespace>BeamSimulator</RootNamespace>
+    <AssemblyName>BeamSimulator</AssemblyName>
+    <OutputType>Library</OutputType>
+    <LangVersion>latest</LangVersion>
+    <Description>RobotStudio SmartComponent for dynamic beam geometry visualization</Description>
+  </PropertyGroup>
+
+  <!-- ABB RobotStudio 2025 SDK references -->
+  <ItemGroup>
+    <Reference Include="ABB.Robotics.Math">
+      <HintPath>C:\Program Files (x86)\ABB\RobotStudio 2025\Bin\ABB.Robotics.Math.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ABB.Robotics.RobotStudio">
+      <HintPath>C:\Program Files (x86)\ABB\RobotStudio 2025\Bin\ABB.Robotics.RobotStudio.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ABB.Robotics.RobotStudio.Stations">
+      <HintPath>C:\Program Files (x86)\ABB\RobotStudio 2025\Bin\ABB.Robotics.RobotStudio.Stations.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- After build: copy DLL next to XML, run LibraryCompiler to create .rslib -->
+  <Target Name="BuildRslib" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ProjectDir)" />
+    <Exec Command="&quot;C:\Program Files (x86)\ABB\RobotStudio 2025\Bin\LibraryCompiler.exe&quot; &quot;$(ProjectDir)BeamSimulator.xml&quot;"
+          WorkingDirectory="$(ProjectDir)"
+          IgnoreExitCode="true" />
+  </Target>
+
+</Project>

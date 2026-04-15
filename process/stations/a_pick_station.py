@@ -12,6 +12,7 @@ from compas.geometry import Frame
 import _skills.custom_motion as cm
 from _skills.fabdata import load_data, get_element
 from _skills.gripper import gripper_open, gripper_close
+from _skills.SimBeam import sim_beam_activate
 from _skills.WoodStorage.wood_storage import WoodStorage
 
 from globals import (
@@ -24,7 +25,7 @@ from joint_positions import jp_pick
 COORD_MOVE_TIME = 1
 
 
-def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True):
+def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True, sim_beams=False):
     """Pick beam from storage.
 
     Args:
@@ -88,7 +89,7 @@ def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True)
         ext_axes=[extax],
         time=COORD_MOVE_TIME,
         zone=rrc.Zone.Z50,
-        motion_type=rrc.Motion.LINEAR
+        motion_type=rrc.Motion.JOINT
     ))
     print(f"At pre-approach (extax={extax}).")
 
@@ -115,6 +116,10 @@ def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True)
 
     # Close gripper
     gripper_close(r1, dry_run=dry_run, wait=True)
+
+    # Activate beam geometry in simulation (beam appears at TCP)
+    if sim_beams:
+        sim_beam_activate(r1, layer_idx, i, dry_run=dry_run)
 
     # Define and activate gripper load
     r1.send(rrc.CustomInstruction('r_RRC_CI_GripLoad', ['Define'], [0.3, 0, 0, 0.01, 1, 0, 0, 0, 0, 0, 0]))

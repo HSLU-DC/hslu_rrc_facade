@@ -11,6 +11,7 @@ from compas.geometry import Frame, Point
 
 import _skills.custom_motion as cm
 from _skills.fabdata import load_data, get_element
+from _skills.SimBeam import sim_swap_cut_a, sim_swap_cut_b
 from _skills.WoodStorage.wood_storage import WoodStorage
 
 from globals import (
@@ -50,7 +51,7 @@ def _get_original_rotation_frame(cut_frame):
 
 def _do_cut_sequence(r1, cut_frame, rotation_point=None, *, dry_run=False,
                      saw_on=False, saw_off=False, skip_initial_move=False,
-                     use_original_rotation=False):
+                     use_original_rotation=False, on_arrived=None):
     """Run approach + cut + retract sequence for one cut frame.
 
     Args:
@@ -60,6 +61,7 @@ def _do_cut_sequence(r1, cut_frame, rotation_point=None, *, dry_run=False,
         saw_off: Turn saw OFF after cutting
         skip_initial_move: Skip move to rotation_frame (already there)
         use_original_rotation: Use offset-based rotation frame
+        on_arrived: Callable invoked right after the robot reaches cut_frame
     """
     if dry_run:
         print(f"  [CUT-SEQ] frame: X={cut_frame.point.x:.1f} Y={cut_frame.point.y:.1f} Z={cut_frame.point.z:.1f} | saw_on={saw_on} | saw_off={saw_off}")
@@ -87,6 +89,10 @@ def _do_cut_sequence(r1, cut_frame, rotation_point=None, *, dry_run=False,
     # Cut move
     r1.send(rrc.MoveToFrame(cut_frame, SPEED_CUT, rrc.Zone.FINE, rrc.Motion.LINEAR))
 
+    # Trigger swap/hook the moment the robot arrives at cut_frame
+    if on_arrived is not None:
+        on_arrived()
+
     # Retract slightly in -X
     cut_retract = cut_frame.copy()
     cut_retract.point.x -= 30
@@ -100,7 +106,7 @@ def _do_cut_sequence(r1, cut_frame, rotation_point=None, *, dry_run=False,
     r1.send(rrc.MoveToFrame(rotation_frame, SPEED_WITH_MEMBER, rrc.Zone.Z50, rrc.Motion.LINEAR))
 
 
-def b_cut_station(r1, data, i, *, layer_idx=0, dry_run=False, saw_enabled=True):
+def b_cut_station(r1, data, i, *, layer_idx=0, dry_run=False, saw_enabled=True, sim_beams=False):
     """Execute dual cuts on element.
 
     Both cuts are always executed (both ends of the beam).
@@ -158,14 +164,20 @@ def b_cut_station(r1, data, i, *, layer_idx=0, dry_run=False, saw_enabled=True):
     ))
     print("At cut station (coordinated move).")
 
+    # Swap hooks: fire the moment the robot arrives at the cut frame
+    on_arrived_a = (lambda: sim_swap_cut_a(r1, dry_run=dry_run)) if sim_beams else None
+    on_arrived_b = (lambda: sim_swap_cut_b(r1, dry_run=dry_run)) if sim_beams else None
+
     # Cut A: saw ON, stays on
     _do_cut_sequence(r1, cut_a_frame, rotation_point,
-                     saw_on=saw_enabled, saw_off=False, skip_initial_move=True)
+                     saw_on=saw_enabled, saw_off=False, skip_initial_move=True,
+                     on_arrived=on_arrived_a)
 
     # Cut B: saw stays on, OFF at end
     _do_cut_sequence(r1, cut_b_frame,
                      saw_on=False, saw_off=saw_enabled,
-                     skip_initial_move=False, use_original_rotation=True)
+                     skip_initial_move=False, use_original_rotation=True,
+                     on_arrived=on_arrived_b)
 
     # Leave station
     r1.send_and_wait(rrc.MoveToJoints(jp_cut.robax, [], SPEED_WITH_MEMBER, rrc.Zone.Z30))
