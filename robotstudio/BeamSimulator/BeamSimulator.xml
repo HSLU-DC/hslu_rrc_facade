@@ -12,8 +12,6 @@
       <!-- Properties -->
       <Properties>
         <DynamicProperty name="GeometryFolder" valueType="System.String" value="" />
-        <DynamicProperty name="MetadataFile" valueType="System.String" value="sim_metadata.json" />
-        <DynamicProperty name="MechanismName" valueType="System.String" value="" />
         <DynamicProperty name="ToolName" valueType="System.String" value="t_HSLU_GripperZimmer" />
       </Properties>
 

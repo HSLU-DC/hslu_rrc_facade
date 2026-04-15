@@ -28,6 +28,12 @@ namespace BeamSimulator
         private const string KEY_CURRENT_STAGE = "CurrentStage";
         private const string KEY_PLACED_BEAMS = "PlacedBeams";
         private const string KEY_TCP_OFFSET = "CachedTcpOffset";
+        private const string KEY_CACHE_RESTORED = "GeometryFolderCacheRestored";
+
+        // Per-station GeometryFolder cache: %APPDATA%\HSLU_BeamSimulator\station_paths.txt
+        // Format: <station_path>\t<geometry_folder>\n
+        private const string CACHE_DIR_NAME = "HSLU_BeamSimulator";
+        private const string CACHE_FILE_NAME = "station_paths.txt";
 
         // ============================================================
         // Initialization
@@ -37,6 +43,7 @@ namespace BeamSimulator
         {
             base.OnInitialize(component);
             InitializeStateCache(component);
+            TryRestoreGeometryFolder(component);
         }
 
         public override void OnSimulationStart(SmartComponent component)
@@ -80,12 +87,20 @@ namespace BeamSimulator
             if (changedProperty.Name == "GeometryFolder")
             {
                 string folder = changedProperty.Value as string;
-                if (!string.IsNullOrEmpty(folder) && !Directory.Exists(folder))
+                if (string.IsNullOrEmpty(folder))
+                    return;
+
+                if (!Directory.Exists(folder))
                 {
                     Logger.AddMessage(
                         new LogMessage($"BeamSimulator: GeometryFolder not found: {folder}",
                         LogMessageSeverity.Warning));
+                    return;
                 }
+
+                // Remember this folder for the current station so the next time
+                // the same .rsstn is opened, the value is auto-populated.
+                SaveStationCacheEntry(folder);
             }
             else if (changedProperty.Name == "ToolName")
             {
@@ -460,23 +475,18 @@ namespace BeamSimulator
         }
 
         /// <summary>
-        /// Find the robot mechanism in the station.
+        /// Find the first robot mechanism in the active station.
         /// </summary>
         private Mechanism FindMechanism(SmartComponent component)
         {
-            string mechName = component.Properties["MechanismName"].Value as string;
             Station station = Station.ActiveStation;
-
             if (station == null)
                 return null;
 
             foreach (var gc in station.GraphicComponents)
             {
                 if (gc is Mechanism mech)
-                {
-                    if (string.IsNullOrEmpty(mechName) || mech.Name == mechName)
-                        return mech;
-                }
+                    return mech;
             }
 
             return null;
@@ -497,6 +507,146 @@ namespace BeamSimulator
         /// </summary>
         private void PulseReady(SmartComponent component)
         {
+        }
+
+        // ============================================================
+        // Per-station GeometryFolder cache
+        // ============================================================
+        //
+        // A tiny key/value store in %APPDATA%\HSLU_BeamSimulator\station_paths.txt
+        // that remembers which geometry folder a given .rsstn file was last
+        // associated with. Each user sets the path once per station; every
+        // subsequent open auto-populates the GeometryFolder property.
+        //
+        // Format: <station_full_path>\t<geometry_folder>\n
+        // Keyed case-insensitively (Windows paths).
+
+        /// <summary>
+        /// Auto-populate GeometryFolder from AppData cache if:
+        ///   - property is empty or points to a non-existent folder
+        ///   - the active station has a file name (saved)
+        ///   - the cache has an entry for that station
+        /// </summary>
+        private void TryRestoreGeometryFolder(SmartComponent component)
+        {
+            try
+            {
+                if (component.StateCache.ContainsKey(KEY_CACHE_RESTORED))
+                    return;
+                component.StateCache[KEY_CACHE_RESTORED] = true;
+
+                string current = component.Properties["GeometryFolder"].Value as string;
+                if (!string.IsNullOrEmpty(current) && Directory.Exists(current))
+                    return;
+
+                string stationKey = GetStationKey();
+                if (string.IsNullOrEmpty(stationKey))
+                    return;
+
+                Dictionary<string, string> cache = LoadStationCache();
+                if (!cache.TryGetValue(stationKey, out string cached))
+                    return;
+
+                if (!Directory.Exists(cached))
+                {
+                    Logger.AddMessage(new LogMessage(
+                        $"BeamSimulator: Cached GeometryFolder no longer exists: {cached}",
+                        LogMessageSeverity.Warning));
+                    return;
+                }
+
+                component.Properties["GeometryFolder"].Value = cached;
+                Logger.AddMessage(new LogMessage(
+                    $"BeamSimulator: Restored GeometryFolder from cache: {cached}"));
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"TryRestoreGeometryFolder: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Write/overwrite the cache entry for the active station.
+        /// </summary>
+        private void SaveStationCacheEntry(string geometryFolder)
+        {
+            try
+            {
+                string stationKey = GetStationKey();
+                if (string.IsNullOrEmpty(stationKey))
+                    return;
+
+                Dictionary<string, string> cache = LoadStationCache();
+                cache[stationKey] = geometryFolder;
+                SaveStationCache(cache);
+
+                Logger.AddMessage(new LogMessage(
+                    $"BeamSimulator: Cached GeometryFolder for {Path.GetFileName(stationKey)}"));
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"SaveStationCacheEntry: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Returns the cache key for the active station (lower-cased full path),
+        /// or null if the station has not been saved yet.
+        /// </summary>
+        private string GetStationKey()
+        {
+            string stationPath = Station.ActiveStation?.FileInfo?.FullName;
+            if (string.IsNullOrEmpty(stationPath))
+                return null;
+            return stationPath.ToLowerInvariant();
+        }
+
+        private Dictionary<string, string> LoadStationCache()
+        {
+            var cache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            string path = GetCachePath();
+            if (!File.Exists(path))
+                return cache;
+
+            try
+            {
+                foreach (string line in File.ReadAllLines(path))
+                {
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+                    string[] parts = line.Split('\t');
+                    if (parts.Length == 2)
+                        cache[parts[0]] = parts[1];
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"LoadStationCache: {ex.Message}");
+            }
+            return cache;
+        }
+
+        private void SaveStationCache(Dictionary<string, string> cache)
+        {
+            string path = GetCachePath();
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                var lines = new List<string>();
+                foreach (KeyValuePair<string, string> kv in cache)
+                    lines.Add(kv.Key + "\t" + kv.Value);
+                File.WriteAllLines(path, lines);
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"SaveStationCache: {ex.Message}");
+            }
+        }
+
+        private string GetCachePath()
+        {
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            return Path.Combine(appData, CACHE_DIR_NAME, CACHE_FILE_NAME);
         }
 
         private void LogWarning(string message)

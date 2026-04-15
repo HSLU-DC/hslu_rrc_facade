@@ -33,13 +33,14 @@
 #   L{layer}_E{element}_raw.stl    Raw stock beam (box)
 #   L{layer}_E{element}_cutA.stl   After first miter cut
 #   L{layer}_E{element}_cutB.stl   Finished beam (both cuts)
-#   sim_metadata.json               Element metadata
 #
 # All STLs in grip-center-relative coordinates (origin = centerline midpoint).
+# The SmartComponent derives filenames from the element and layer signals
+# via the L{layer}_E{element}_{stage}.stl convention, so no metadata file
+# is needed.
 
 import os
 import struct
-import json
 import System
 
 import Rhino
@@ -375,19 +376,6 @@ def export_brep_as_stl(brep, to_local, file_path):
 
 
 # ==============================================================================
-# Metadata JSON
-# ==============================================================================
-
-def format_grip_frame(grip_center, grip_plane):
-    """Format grip frame for metadata JSON."""
-    return {
-        "origin": [round(grip_center.X, 6), round(grip_center.Y, 6), round(grip_center.Z, 6)],
-        "xaxis": [round(grip_plane.XAxis.X, 6), round(grip_plane.XAxis.Y, 6), round(grip_plane.XAxis.Z, 6)],
-        "yaxis": [round(grip_plane.YAxis.X, 6), round(grip_plane.YAxis.Y, 6), round(grip_plane.YAxis.Z, 6)],
-    }
-
-
-# ==============================================================================
 # Main export logic
 # ==============================================================================
 
@@ -411,8 +399,6 @@ if update:
         output = "ERROR: No layers detected in DataTree"
         print(output)
     else:
-        # Process all elements
-        meta_layers = []
         total_elements = 0
         total_files = 0
         errors = []
@@ -420,8 +406,6 @@ if update:
         for layer_idx in range(n_layers):
             n_elements = elements_per_layer.get(layer_idx, 0)
             print("\nLayer {} ({} elements)".format(layer_idx, n_elements))
-
-            meta_elements = []
 
             for elem_idx in range(n_elements):
                 branch = get_branch(fab_data, GH_Path(layer_idx, elem_idx))
@@ -488,36 +472,7 @@ if update:
                 else:
                     errors.append("{} cutB: {}".format(prefix, msg))
 
-                # Metadata
-                meta_elements.append({
-                    "id": elem_idx,
-                    "beam_size": size,
-                    "files": {
-                        "raw": "{}_raw.stl".format(prefix),
-                        "cutA": "{}_cutA.stl".format(prefix),
-                        "cutB": "{}_cutB.stl".format(prefix),
-                    },
-                    "grip_frame_world": format_grip_frame(grip_center, grip_plane),
-                })
-
                 total_elements += 1
-
-            meta_layers.append({
-                "id": layer_idx,
-                "element_count": len(meta_elements),
-                "elements": meta_elements,
-            })
-
-        # Write metadata JSON
-        metadata = {
-            "version": "1.0",
-            "project": "facade",
-            "beam_section_mm": BEAM_SECTION,
-            "layers": meta_layers,
-        }
-        meta_path = os.path.join(folder_path, "sim_metadata.json")
-        with open(meta_path, 'w') as f:
-            json.dump(metadata, f, indent=2)
 
         # Summary
         print("\n" + "=" * 50)
