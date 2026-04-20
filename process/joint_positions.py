@@ -35,7 +35,7 @@ jp_park = Jointtarget([180, -30, 75, 0, 45, 90], [0.0])
 
 jp_pick = Jointtarget([-53.13, 44.33, 9.19, 0.38, 36.05, -53.1], [1000.0])
 jp_cut = Jointtarget([-50, 20, 40, 0, 30, -50], [500.0])
-jp_glue = Jointtarget([-33.61, 7.22, 58.23, 0.0, 24.55, -33.61], [200.0])
+jp_glue = Jointtarget([-33.61, 7.22, 58.23, 0.0, 24.55, -33.61], [500.0])
 jp_pre_app_place = Jointtarget([-30, 0, 25, 0, 65, -30], [500.0])  # TODO: verify
 jp_app_place = Jointtarget([15, 0, 25, 0, 65, 15], [500.0])  # TODO: verify
 jp_place = Jointtarget([50, 0, 30, 0, 65, 45], [700.0])  # TODO: verify
