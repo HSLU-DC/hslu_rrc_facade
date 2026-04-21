@@ -4,14 +4,23 @@ Beam geometry visualization for RobotStudio simulation via SmartComponent.
 
 ## Overview
 
-Controls the `BeamSimulator` SmartComponent in RobotStudio to show/swap/release
-beam geometry during the production simulation. Only active on the virtual
-controller (`NOT RobOS()`).
+Controls the `BeamSimulator` SmartComponent in RobotStudio to load, swap and
+release beam geometry during the production simulation. Only active on the
+virtual controller (`NOT RobOS()`).
 
 ## Python API
 
 ```python
-from _skills.SimBeam import sim_beam_activate, sim_swap_cut_a, sim_swap_cut_b, sim_beam_release
+from _skills.SimBeam import (
+    sim_beam_activate,
+    sim_swap_cut_a,
+    sim_swap_cut_b,
+    sim_beam_release,
+    sim_beam_reset,
+)
+
+# Start of production: clear previously placed beams
+sim_beam_reset(r1, dry_run=False)
 
 # Before pick: show raw beam, attach to gripper
 sim_beam_activate(r1, layer=0, element=3, dry_run=False)
@@ -34,6 +43,7 @@ sim_beam_release(r1, dry_run=False)
 | `r_HSLU_SimSwapCutA` | (none) | Pulse SwapCutA |
 | `r_HSLU_SimSwapCutB` | (none) | Pulse SwapCutB |
 | `r_HSLU_SimBeamRelease` | (none) | Pulse Release |
+| `r_HSLU_SimBeamReset` | (none) | Pulse Reset (clear placed beams) |
 
 ## EIO Signals (Virtual Controller)
 
@@ -45,7 +55,10 @@ sim_beam_release(r1, dry_run=False)
 | `do_SC_SwapCutA` | DO | Swap to cut-A geometry |
 | `do_SC_SwapCutB` | DO | Swap to finished geometry |
 | `do_SC_Release` | DO | Detach (beam stays) |
-| `di_SC_Ready` | DI | SmartComponent feedback |
+| `do_SC_Reset` | DO | Delete all placed beams |
+
+The SmartComponent signal names match the RAPID names 1:1, so I/O connections
+in RobotStudio can be wired with identical names on both sides.
 
 ## Geometry Files
 
@@ -54,7 +67,9 @@ Expected in `process/data/geometry/`:
 L{layer}_E{element}_raw.stl    # Raw stock beam
 L{layer}_E{element}_cutA.stl   # After first miter cut
 L{layer}_E{element}_cutB.stl   # After second cut (finished)
-sim_metadata.json               # Element metadata
 ```
 
-All STLs are in grip-center-relative coordinates (origin = centerline midpoint).
+All STLs are in grip-center-relative coordinates (origin = centerline midpoint),
+so the SmartComponent can attach them at the gripper TCP without further
+transforms. Produced by the `ExportFacade` Grasshopper component
+(`design/simulation/ExportFacade.py`) alongside the fab_data JSON.

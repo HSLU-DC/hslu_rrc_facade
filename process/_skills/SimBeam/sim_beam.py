@@ -6,7 +6,7 @@ digital/group outputs. Only active on virtual controller (NOT RobOS).
 
 RAPID module: HSLU_SimBeam.mod
 Signals: go_SC_ElementID, go_SC_LayerID, do_SC_Activate,
-         do_SC_SwapCutA, do_SC_SwapCutB, do_SC_Release, di_SC_Ready
+         do_SC_SwapCutA, do_SC_SwapCutB, do_SC_Release, do_SC_Reset
 """
 from __future__ import annotations
 

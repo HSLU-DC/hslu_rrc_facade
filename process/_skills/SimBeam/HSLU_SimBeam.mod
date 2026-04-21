@@ -15,7 +15,7 @@ MODULE HSLU_SimBeam
     !   do_SC_SwapCutA   (DO)         - Swap to after-cut-A geometry
     !   do_SC_SwapCutB   (DO)         - Swap to finished geometry
     !   do_SC_Release    (DO)         - Detach beam (stays at place position)
-    !   di_SC_Ready      (DI)         - SmartComponent feedback
+    !   do_SC_Reset      (DO)         - Delete all placed beams
     !******************** HSLU **********************
 
 

@@ -15,6 +15,9 @@ README.md                    # Student-facing overview
 design/
   hslu_rrc_facade.ghx        # GH template: export, validation, IK visualization
   hslu_rrc_facade.3dm        # Rhino file (not in git, too large)
+  simulation/
+    ExportFacade.py          # GH component: writes fab_data JSON + 3 STLs per element
+    ExportSimGeometry.py     # (legacy standalone STL exporter, superseded by ExportFacade)
 
 docs/
   images/                    # Documentation images
@@ -22,6 +25,13 @@ docs/
 docker/
   REAL-docker-compose.yml    # ROS + ABB driver (real controller)
   VIRTUAL-docker-compose.yml # ROS + ABB driver (virtual controller)
+
+robotstudio/
+  BeamSimulator/             # RS 2025 SmartComponent: dynamic beam visualization
+    BeamSimulator.csproj     # SDK-style C#/.NET Framework 4.8 project
+    BeamSimulator.xml        # LibraryCompiler descriptor (signals + properties)
+    BeamSimulatorCodeBehind.cs  # SmartComponent logic (Activate/Swap/Release/Reset)
+    README.md                # Build + install + signal wiring
 
 process/                     # (Work in Progress)
   production.py              # Main loop: Pick → Cut → Glue → Place
@@ -35,6 +45,7 @@ process/                     # (Work in Progress)
     gripper.py               # Open/close via RAPID custom instructions
     GlueLine/                # All-in-one glue line execution in RAPID (avoids Python latency)
     GluePLC/                 # PLC safety handshake for glue system
+    SimBeam/                 # Virtual-only: drives BeamSimulator SmartComponent via EIO
     SoftAct/                 # Compliant servo for soft gripping/pressing
     WoodStorage/             # Inventory management (small/large categories, round-robin pick)
 
@@ -47,6 +58,7 @@ process/                     # (Work in Progress)
   data/
     fab_data.json            # Student export (from GH)
     wood_storage.json        # Inventory state (persisted between runs)
+    geometry/                # Runtime STL dump for BeamSimulator (gitignored)
 ```
 
 ## Student Input (GH)
@@ -118,6 +130,7 @@ ros.terminate()
 | `r_RRC_CI_GripLoad` | Workpiece load definition |
 | `r_RRC_CI_GlueLine` | All-in-one glue line in RAPID |
 | `r_RRC_CI_SoftAct/Deact` | Soft servo axis |
+| `r_HSLU_SimBeam*` | Virtual-only: drive BeamSimulator SmartComponent (Activate/SwapCutA/SwapCutB/Release/Reset) |
 
 ## Workobjects
 - `ob_HSLU_Pick_small` / `ob_HSLU_Pick_large` — Pick station (defined in wood_storage.json)
