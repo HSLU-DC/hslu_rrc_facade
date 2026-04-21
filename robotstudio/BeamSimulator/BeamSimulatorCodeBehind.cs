@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using ABB.Robotics.Math;
 using ABB.Robotics.RobotStudio;
@@ -34,6 +35,9 @@ namespace BeamSimulator
         // Format: <station_path>\t<geometry_folder>\n
         private const string CACHE_DIR_NAME = "HSLU_BeamSimulator";
         private const string CACHE_FILE_NAME = "station_paths.txt";
+
+        // Light wood color applied to every loaded beam body.
+        private static readonly Color WoodColor = Color.FromArgb(180, 130, 80);
 
         // ============================================================
         // Initialization
@@ -130,19 +134,19 @@ namespace BeamSimulator
 
             switch (signal.Name)
             {
-                case "Activate":
+                case "do_SC_Activate":
                     HandleActivate(component);
                     break;
-                case "SwapCutA":
+                case "do_SC_SwapCutA":
                     HandleSwapCut(component, "cutA");
                     break;
-                case "SwapCutB":
+                case "do_SC_SwapCutB":
                     HandleSwapCut(component, "cutB");
                     break;
-                case "Release":
+                case "do_SC_Release":
                     HandleRelease(component);
                     break;
-                case "Reset":
+                case "do_SC_Reset":
                     HandleReset(component);
                     break;
             }
@@ -159,8 +163,8 @@ namespace BeamSimulator
                 Logger.AddMessage(new LogMessage("BeamSimulator: Activate triggered"));
 
                 // Read element/layer from signals (handle different value types)
-                int elementId = Convert.ToInt32(component.IOSignals["ElementID"].Value);
-                int layerId = Convert.ToInt32(component.IOSignals["LayerID"].Value);
+                int elementId = Convert.ToInt32(component.IOSignals["go_SC_ElementID"].Value);
+                int layerId = Convert.ToInt32(component.IOSignals["go_SC_LayerID"].Value);
                 Logger.AddMessage(new LogMessage(
                     $"BeamSimulator: ElementID={elementId}, LayerID={layerId}"));
 
@@ -377,6 +381,7 @@ namespace BeamSimulator
                     part.Name = Path.GetFileNameWithoutExtension(filePath);
                     Station station = Station.ActiveStation;
                     station?.GraphicComponents.Add(part);
+                    ApplyWoodColor(part);
                 }
                 return part;
             }
@@ -384,6 +389,27 @@ namespace BeamSimulator
             {
                 LogWarning($"Failed to load STL: {ex.Message}");
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Colour a freshly loaded beam in a light wood tone.
+        /// STL loads as a pure mesh - Bodies is empty. Part.Color is inherited from
+        /// GraphicComponent and sets the display colour directly on the mesh part.
+        /// </summary>
+        private void ApplyWoodColor(Part part)
+        {
+            if (part == null)
+                return;
+            try
+            {
+                part.Color = WoodColor;
+                Logger.AddMessage(new LogMessage(
+                    $"BeamSimulator: Coloured {part.Name}"));
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"ApplyWoodColor: {ex.Message}");
             }
         }
 

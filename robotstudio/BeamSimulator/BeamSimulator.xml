@@ -15,15 +15,16 @@
         <DynamicProperty name="ToolName" valueType="System.String" value="t_HSLU_GripperZimmer" />
       </Properties>
 
-      <!-- Signals: Input = SC receives from RAPID, Output = SC sends to RAPID -->
+      <!-- Signals: Input = SC receives from RAPID, Output = SC sends to RAPID.
+           Names match the RAPID side 1:1 to simplify I/O connections. -->
       <Signals>
-        <IOSignal name="ElementID" signalType="DigitalGroupInput" value="0" />
-        <IOSignal name="LayerID" signalType="DigitalGroupInput" value="0" />
-        <IOSignal name="Activate" signalType="DigitalInput" value="0" />
-        <IOSignal name="SwapCutA" signalType="DigitalInput" value="0" />
-        <IOSignal name="SwapCutB" signalType="DigitalInput" value="0" />
-        <IOSignal name="Release" signalType="DigitalInput" value="0" />
-        <IOSignal name="Reset" signalType="DigitalInput" value="0" />
+        <IOSignal name="go_SC_ElementID" signalType="DigitalGroupInput" value="0" />
+        <IOSignal name="go_SC_LayerID" signalType="DigitalGroupInput" value="0" />
+        <IOSignal name="do_SC_Activate" signalType="DigitalInput" value="0" />
+        <IOSignal name="do_SC_SwapCutA" signalType="DigitalInput" value="0" />
+        <IOSignal name="do_SC_SwapCutB" signalType="DigitalInput" value="0" />
+        <IOSignal name="do_SC_Release" signalType="DigitalInput" value="0" />
+        <IOSignal name="do_SC_Reset" signalType="DigitalInput" value="0" />
       </Signals>
 
       <!-- Embedded DLL -->
