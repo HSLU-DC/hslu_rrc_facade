@@ -14,6 +14,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using ABB.Robotics.Controllers;
+using ABB.Robotics.Controllers.RapidDomain;
 using ABB.Robotics.Math;
 using ABB.Robotics.RobotStudio;
 using ABB.Robotics.RobotStudio.Stations;
@@ -30,6 +33,15 @@ namespace BeamSimulator
         private const string KEY_PLACED_BEAMS = "PlacedBeams";
         private const string KEY_TCP_OFFSET = "CachedTcpOffset";
         private const string KEY_CACHE_RESTORED = "GeometryFolderCacheRestored";
+        private const string KEY_RUNTIME_FOLDER = "RuntimeGeometryFolder";
+        private const string KEY_RUNTIME_TOOL = "RuntimeToolName";
+
+        // RAPID PERS variable names populated by r_HSLU_SimBeamReset.
+        // If set and non-empty, they override the SC's Property values.
+        private const string RAPID_TASK = "T_ROB1";
+        private const string RAPID_MODULE = "HSLU_SimBeam";
+        private const string PERS_GEOMETRY_FOLDER = "sim_geometry_folder";
+        private const string PERS_TOOL_NAME = "sim_tool_name";
 
         // Per-station GeometryFolder cache: %APPDATA%\HSLU_BeamSimulator\station_paths.txt
         // Format: <station_path>\t<geometry_folder>\n
@@ -171,8 +183,11 @@ namespace BeamSimulator
                 component.StateCache[KEY_CURRENT_ELEMENT] = elementId;
                 component.StateCache[KEY_CURRENT_LAYER] = layerId;
 
-                // Build filename
-                string folder = component.Properties["GeometryFolder"].Value as string;
+                // Build filename. Runtime value from RAPID PERS (cached on
+                // Reset) wins over the SC Property so students don't have to
+                // type the path in RobotStudio.
+                string folder = (component.StateCache[KEY_RUNTIME_FOLDER] as string)
+                    ?? component.Properties["GeometryFolder"].Value as string;
                 Logger.AddMessage(new LogMessage(
                     $"BeamSimulator: GeometryFolder='{folder}'"));
 
@@ -242,8 +257,10 @@ namespace BeamSimulator
                 Logger.AddMessage(new LogMessage("BeamSimulator: Old part removed"));
             }
 
-            // Load new STL and attach at TCP
-            string folder = component.Properties["GeometryFolder"].Value as string;
+            // Load new STL and attach at TCP. Same override precedence as
+            // HandleActivate: runtime PERS cache first, property as fallback.
+            string folder = (component.StateCache[KEY_RUNTIME_FOLDER] as string)
+                ?? component.Properties["GeometryFolder"].Value as string;
             string fileName = $"L{layerId}_E{elementId}_{stage}.stl";
             string filePath = Path.Combine(folder, fileName);
 
@@ -314,6 +331,11 @@ namespace BeamSimulator
             {
                 Logger.AddMessage(new LogMessage("BeamSimulator: Reset triggered"));
 
+                // RAPID has just written sim_geometry_folder / sim_tool_name
+                // into the PERS before pulsing this signal. Pull the current
+                // values and cache them for subsequent Activate / TCP lookups.
+                RefreshRuntimeOverrides(component);
+
                 // Delete current part if any
                 Part currentPart = component.StateCache[KEY_CURRENT_PART] as Part;
                 Mechanism mech = FindMechanism(component);
@@ -347,6 +369,11 @@ namespace BeamSimulator
                 component.StateCache[KEY_CURRENT_ELEMENT] = -1;
                 component.StateCache[KEY_CURRENT_LAYER] = -1;
                 component.StateCache[KEY_CURRENT_STAGE] = "idle";
+
+                // Reset also carries the folder/tool PERS update from RAPID,
+                // so the cached TCP offset must be re-looked-up on next Activate.
+                if (component.StateCache.ContainsKey(KEY_TCP_OFFSET))
+                    component.StateCache.Remove(KEY_TCP_OFFSET);
 
                 Logger.AddMessage(new LogMessage(
                     $"BeamSimulator: Reset complete - deleted {count} placed beams"));
@@ -463,12 +490,15 @@ namespace BeamSimulator
 
         /// <summary>
         /// Actually look up the tool offset from the station. Called only once.
+        /// RAPID PERS sim_tool_name (pushed via sim_beam_reset) overrides the
+        /// SC's ToolName Property when populated.
         /// </summary>
         private Matrix4 LookupToolOffset(SmartComponent component)
         {
             try
             {
-                string toolName = component.Properties["ToolName"].Value as string;
+                string toolName = (component.StateCache[KEY_RUNTIME_TOOL] as string)
+                    ?? component.Properties["ToolName"].Value as string;
                 Station station = Station.ActiveStation;
 
                 if (station != null && !string.IsNullOrEmpty(toolName))
@@ -498,6 +528,63 @@ namespace BeamSimulator
             }
 
             return Matrix4.Identity;
+        }
+
+        /// <summary>
+        /// Read the current runtime value of a RAPID PERS string variable
+        /// from the virtual controller. Uses the Controller SDK because the
+        /// Stations SDK only exposes the declaration-time initial value.
+        /// Returns null on any failure so the caller can fall back to a
+        /// Property default.
+        /// </summary>
+        private string ReadPersString(string moduleName, string varName)
+        {
+            try
+            {
+                Station station = Station.ActiveStation;
+                if (station == null)
+                    return null;
+
+                RsIrc5Controller rsCtrl = station.Irc5Controllers
+                    .OfType<RsIrc5Controller>()
+                    .FirstOrDefault();
+                if (rsCtrl == null)
+                    return null;
+
+                using (Controller ctrl = Controller.Connect(
+                    new Guid(rsCtrl.SystemId), ConnectionType.RobotStudio))
+                {
+                    ctrl.Logon(UserInfo.DefaultUser);
+                    RapidData rd = ctrl.Rapid.GetRapidData(RAPID_TASK, moduleName, varName);
+                    object v = rd?.Value;
+                    string val = v?.ToString()?.Trim('"');
+                    return string.IsNullOrEmpty(val) ? null : val;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"ReadPersString({varName}): {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Pull the runtime PERS values (folder, tool) from the controller
+        /// and cache them. Called on Reset — the sim_beam_reset call from
+        /// Python writes the PERS before pulsing do_SC_Reset, so the latest
+        /// values are in place when this runs.
+        /// </summary>
+        private void RefreshRuntimeOverrides(SmartComponent component)
+        {
+            string folder = ReadPersString(RAPID_MODULE, PERS_GEOMETRY_FOLDER);
+            string tool = ReadPersString(RAPID_MODULE, PERS_TOOL_NAME);
+
+            component.StateCache[KEY_RUNTIME_FOLDER] = folder;
+            component.StateCache[KEY_RUNTIME_TOOL] = tool;
+
+            Logger.AddMessage(new LogMessage(
+                $"BeamSimulator: Runtime overrides - folder='{folder ?? "(fallback)"}' " +
+                $"tool='{tool ?? "(fallback)"}'"));
         }
 
         /// <summary>

@@ -23,6 +23,10 @@
       <HintPath>C:\Program Files (x86)\ABB\RobotStudio 2025\Bin\ABB.Robotics.RobotStudio.Stations.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="ABB.Robotics.Controllers.PC">
+      <HintPath>C:\Program Files (x86)\ABB\RobotStudio 2025\Bin\ABB.Robotics.Controllers.PC.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
 
   <!-- After build: copy DLL next to XML, run LibraryCompiler to create .rslib -->

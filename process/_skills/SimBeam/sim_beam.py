@@ -10,7 +10,24 @@ Signals: go_SC_ElementID, go_SC_LayerID, do_SC_Activate,
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import compas_rrc as rrc
+
+
+# _skills/SimBeam/sim_beam.py -> process/data/geometry
+_DEFAULT_GEOMETRY_FOLDER = (
+    Path(__file__).resolve().parents[2] / "data" / "geometry"
+)
+
+
+def _default_geometry_folder() -> str:
+    """Return the repo-relative geometry folder with forward slashes.
+
+    Mirrors the convention used by fabdata.py (<process>/data/<...>) so
+    students don't need to configure a path in RobotStudio by hand.
+    """
+    return str(_DEFAULT_GEOMETRY_FOLDER).replace("\\", "/")
 
 
 def sim_beam_activate(r1, layer: int, element: int,
@@ -85,17 +102,49 @@ def sim_beam_release(r1, *, dry_run: bool = False) -> None:
     r1.send_and_wait(rrc.CustomInstruction("r_HSLU_SimBeamRelease", [], []))
 
 
-def sim_beam_reset(r1, *, dry_run: bool = False) -> None:
-    """Delete all placed beams and clear SmartComponent state.
+def sim_beam_reset(
+    r1,
+    *,
+    geometry_folder: str | None = None,
+    tool_name: str | None = None,
+    dry_run: bool = False,
+) -> None:
+    """Delete all placed beams, clear SC state, push folder/tool to RAPID.
 
-    Call at the start of a production run so the facade starts empty.
+    Also forwards the STL folder path and the tool name to the
+    SmartComponent (via RAPID PERS variables ``sim_geometry_folder``
+    and ``sim_tool_name``) so students don't have to set them
+    manually on the SmartComponent's property panel in RobotStudio.
+
+    Call at the start of a production run so the facade starts empty
+    and the SC picks up the current paths.
 
     Args:
         r1: AbbClient instance
-        dry_run: If True, only prints what would happen
+        geometry_folder: Absolute path to STL folder. Defaults to
+            ``<process>/data/geometry`` (derived relative to this file).
+        tool_name: RAPID tool data name. Defaults to
+            ``globals.TOOL_GRIPPER``.
+        dry_run: If True, only prints what would happen.
     """
+    if geometry_folder is None:
+        geometry_folder = _default_geometry_folder()
+    else:
+        geometry_folder = geometry_folder.replace("\\", "/")
+
+    if tool_name is None:
+        # Local import keeps this helper usable from GH / stand-alone scripts
+        # where `globals` is not necessarily on the import path.
+        from globals import TOOL_GRIPPER
+        tool_name = TOOL_GRIPPER
+
     if dry_run or r1 is None:
-        print("[SIM-BEAM] Reset")
+        print(f"[SIM-BEAM] Reset folder='{geometry_folder}' tool='{tool_name}'")
         return
 
-    r1.send_and_wait(rrc.CustomInstruction("r_HSLU_SimBeamReset", [], []))
+    cmd = rrc.CustomInstruction(
+        "r_HSLU_SimBeamReset",
+        [geometry_folder, tool_name],  # .S1, .S2
+        [],
+    )
+    r1.send_and_wait(cmd)

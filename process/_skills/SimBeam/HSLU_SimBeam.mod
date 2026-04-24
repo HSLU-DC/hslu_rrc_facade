@@ -16,7 +16,19 @@ MODULE HSLU_SimBeam
     !   do_SC_SwapCutB   (DO)         - Swap to finished geometry
     !   do_SC_Release    (DO)         - Detach beam (stays at place position)
     !   do_SC_Reset      (DO)         - Delete all placed beams
+    !
+    ! PERS variables:
+    !   sim_geometry_folder (string)  - Absolute STL folder path. Pushed by
+    !                                   Python via r_HSLU_SimBeamReset.St1.
+    !                                   SmartComponent reads this PERS instead
+    !                                   of its GeometryFolder Property when set.
+    !   sim_tool_name       (string)  - Tool data name for TCP offset lookup.
+    !                                   Pushed via r_HSLU_SimBeamReset.St2.
+    !                                   Falls back to SC ToolName Property.
     !******************** HSLU **********************
+
+    PERS string sim_geometry_folder := "";
+    PERS string sim_tool_name := "";
 
 
     !************************************************
@@ -148,6 +160,16 @@ MODULE HSLU_SimBeam
     !******************** HSLU **********************
     !
     PROC r_HSLU_SimBeamReset()
+        VAR string sFolder;
+        VAR string sTool;
+        !
+        ! Pull optional folder / tool overrides from the instruction payload
+        ! (.St1 and .St2). Non-empty values replace the PERS defaults so the
+        ! SmartComponent can pick them up during the subsequent Reset pulse.
+        sFolder := bm_RRC_RecBufferRob{n_RRC_ChaNr,n_RRC_ReadPtrRecBuf}.Data.St1;
+        sTool   := bm_RRC_RecBufferRob{n_RRC_ChaNr,n_RRC_ReadPtrRecBuf}.Data.St2;
+        IF sFolder<>"" THEN sim_geometry_folder := sFolder; ENDIF
+        IF sTool<>""   THEN sim_tool_name       := sTool;   ENDIF
         !
         IF NOT RobOS() THEN
             PulseDO\PLength:=0.2, do_SC_Reset;
