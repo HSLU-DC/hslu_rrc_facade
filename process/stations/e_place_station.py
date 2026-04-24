@@ -10,10 +10,9 @@ _parent = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _parent not in sys.path:
     sys.path.insert(0, _parent)
 
-import math
 import compas_rrc as rrc
 from compas_rrc import Motion
-from compas.geometry import Frame, Vector, Rotation
+from compas.geometry import Frame, Vector
 
 import _skills.custom_motion as cm
 from _skills.fabdata import load_data, get_element
@@ -48,9 +47,6 @@ JOINTS = {
     },
 }
 
-# Rotation after placement (slight twist to ensure contact)
-PLACE_ROTATION_DEG = 1.5
-
 
 # ==============================================================================
 # Helpers
@@ -80,13 +76,6 @@ def get_jointset(name, sign):
     """Return (robax, extax) for given pose name and sign ('pos'/'neg')."""
     js = JOINTS[name][sign]
     return list(js["robax"]), list(js["extax"])
-
-
-def rotate_frame_about_local_z(frame, deg_cw):
-    """Rotate frame about its own local z-axis by deg_cw clockwise."""
-    angle = math.radians(-deg_cw)
-    R = Rotation.from_axis_and_angle(frame.zaxis, angle, point=frame.point)
-    return frame.transformed(R)
 
 
 def create_approach_frame(place_frame, sign):
@@ -208,12 +197,7 @@ def e_place_station(r1, data, i, *, layer_idx=0, dry_run=False, sim_beams=False)
     r1.send(rrc.MoveToFrame(rot_frame, SPEED_APPROACH, rrc.Zone.Z10, rrc.Motion.LINEAR))
     r1.send_and_wait(rrc.MoveToFrame(place_frame, SPEED_PRECISE, rrc.Zone.FINE, rrc.Motion.LINEAR))
 
-    # Slight rotation for press contact
-    deg_cw = -PLACE_ROTATION_DEG if sign == "pos" else PLACE_ROTATION_DEG
-    place_frame_rot = rotate_frame_about_local_z(place_frame, deg_cw=deg_cw)
-    r1.send_and_wait(rrc.MoveToFrame(place_frame_rot, SPEED_PRECISE, rrc.Zone.FINE, rrc.Motion.LINEAR))
-
-    r1.send(rrc.WaitTime(5))
+    r1.send(rrc.WaitTime(2))
 
     # Release
     gripper_open(r1, dry_run=dry_run, wait=True)
@@ -227,7 +211,7 @@ def e_place_station(r1, data, i, *, layer_idx=0, dry_run=False, sim_beams=False)
     r1.send(rrc.WaitTime(1))
 
     # Retract
-    place_retract = place_frame_rot.copy()
+    place_retract = place_frame.copy()
     place_retract.point.z += 50
     r1.send(rrc.MoveToFrame(place_retract, SPEED_APPROACH, rrc.Zone.Z1, rrc.Motion.LINEAR))
     r1.send_and_wait(rrc.MoveToFrame(approach_above_place, SPEED_NO_MEMBER, rrc.Zone.Z1, rrc.Motion.LINEAR))
