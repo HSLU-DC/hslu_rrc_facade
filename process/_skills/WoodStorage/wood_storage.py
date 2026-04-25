@@ -33,6 +33,7 @@ class WoodStorage:
             json_path: Path to inventory JSON file. If None, uses default location.
         """
         if json_path is None:
+            # Default path relative to this file
             this_dir = os.path.dirname(os.path.abspath(__file__))
             json_path = os.path.join(this_dir, "..", "..", "data", "wood_storage.json")
 

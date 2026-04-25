@@ -1,3 +1,33 @@
+# custom_motion.py
+"""Custom motion instructions for coordinated track + robot movement.
+
+The standard COMPAS RRC MoveToJoints/MoveToFrame instructions move only
+the 6 robot axes. On this cell, we have a 7th axis: a Güdel linear track
+(0-3000mm). To move the track and robot simultaneously (coordinated motion),
+we use custom RAPID instructions prefixed with 'r_Gudel_HSLU_'.
+
+These RAPID instructions were developed specifically for this project and
+handle the interpolation so that both the track and robot arrive at their
+targets at the same time.
+
+Classes:
+    MoveToJoints: Coordinated joint move (robot axes + track)
+        → RAPID: r_Gudel_HSLU_MoveToJoints
+    MoveToRobtarget: Coordinated cartesian move (frame + track)
+        → RAPID: r_Gudel_HSLU_MoveTo
+
+Usage:
+    import _skills.custom_motion as cm
+
+    # Move robot joints AND track simultaneously
+    r1.send_and_wait(cm.MoveToJoints(robax, [track_mm], time_s, zone))
+
+    # Move to cartesian frame AND track simultaneously
+    r1.send_and_wait(cm.MoveToRobtarget(frame, [track_mm], time_s, zone))
+
+Note: The 'time' parameter is in SECONDS (not speed in mm/s), because
+the coordinated motion interpolates both axes to finish together.
+"""
 from compas_fab.backends.ros.messages import ROSmsg
 
 from compas_rrc.common import ExecutionLevel

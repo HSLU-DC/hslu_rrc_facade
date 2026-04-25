@@ -1,17 +1,30 @@
 # joint_positions.py
-"""Joint target positions for all stations."""
+"""Predefined joint target positions for the Facade production cell.
+
+Each Jointtarget stores 6 robot axis values (robax, in degrees) and
+1 external axis value (extax, track position in mm).
+
+These positions were taught on the real robot using the FlexPendant
+and serve as safe intermediate waypoints for station transitions.
+The coordinated move system (custom_motion.py) interpolates between
+these positions to move the track and robot simultaneously.
+
+Joint axes:
+    robax[0..5] = J1..J6 in degrees
+    extax[0] = Track position in mm (0 = far end, 2900 = near end)
+"""
 
 
 class Jointtarget:
+    """Simple container for a joint target (robot axes + external axes)."""
     def __init__(self, robax, extax):
-        self.robax = robax
-        self.extax = extax
+        self.robax = robax  # List of 6 floats (degrees)
+        self.extax = extax  # List of 1 float (mm)
 
 
-# ===========================================
-# Joint limits
-# ===========================================
-
+# ==============================================================================
+# Joint limits (from controller configuration)
+# ==============================================================================
 JOINT_LIMITS = {
     'robax_min': [-270, -180, -225, -180, -180, -270],
     'robax_max': [270, 180, 85, 180, 180, 270],
@@ -20,22 +33,22 @@ JOINT_LIMITS = {
 }
 
 
-# ===========================================
+# ==============================================================================
 # Standard positions
-# ===========================================
+# ==============================================================================
+jp_calib = Jointtarget([0, 0, 0, 0, 0, 0], [0.0])           # Calibration (all zeros)
+jp_home = Jointtarget([90, 0, 0, 0, 90, 90], [1000.0])      # Home position
+jp_park = Jointtarget([180, -30, 75, 0, 45, 90], [0.0])     # Park (compact, track retracted)
 
-jp_calib = Jointtarget([0, 0, 0, 0, 0, 0], [0.0])
-jp_home = Jointtarget([90, 0, 0, 0, 90, 90], [1000.0])
-jp_park = Jointtarget([180, -30, 75, 0, 45, 90], [0.0])
 
-
-# ===========================================
-# Station positions
-# ===========================================
-
+# ==============================================================================
+# Station entry positions
+# ==============================================================================
+# These are the joint positions the robot moves to before entering each station.
+# The track position (extax) is set to bring the robot near the station.
 jp_pick = Jointtarget([-53.13, 44.33, 9.19, 0.38, 36.05, -53.1], [1000.0])
 jp_cut = Jointtarget([-50, 20, 40, 0, 30, -50], [500.0])
 jp_glue = Jointtarget([-33.61, 7.22, 58.23, 0.0, 24.55, -33.61], [500.0])
 jp_pre_app_place = Jointtarget([-30, 0, 25, 0, 65, -30], [500.0])  # TODO: verify
-jp_app_place = Jointtarget([15, 0, 25, 0, 65, 15], [500.0])  # TODO: verify
-jp_place = Jointtarget([50, 0, 30, 0, 65, 45], [700.0])  # TODO: verify
+jp_app_place = Jointtarget([15, 0, 25, 0, 65, 15], [500.0])        # TODO: verify
+jp_place = Jointtarget([50, 0, 30, 0, 65, 45], [700.0])            # TODO: verify
