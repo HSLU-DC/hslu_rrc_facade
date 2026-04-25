@@ -2,43 +2,79 @@
   "compartments": {
     "small_1": {
       "category": "small",
-      "capacity": 14,
-      "count": 14,
+      "capacity": 23,
+      "count": 22,
       "wobj": "ob_HSLU_Pick_small",
       "extax": 1000,
       "base_frame": {
-        "point": [279, 244, -552.5],
-        "xaxis": [-1, 0, 0],
-        "yaxis": [0, 1, 0]
+        "point": [
+          279,
+          244,
+          -552.5
+        ],
+        "xaxis": [
+          -1,
+          0,
+          0
+        ],
+        "yaxis": [
+          0,
+          1,
+          0
+        ]
       },
       "stack_offset_z": 25
     },
     "small_2": {
       "category": "small",
-      "capacity": 14,
-      "count": 14,
+      "capacity": 23,
+      "count": 23,
       "wobj": "ob_HSLU_Pick_small",
       "extax": 1000,
       "base_frame": {
-        "point": [279, 161, -552.5],
-        "xaxis": [-1, 0, 0],
-        "yaxis": [0, 1, 0]
+        "point": [
+          279,
+          161,
+          -552.5
+        ],
+        "xaxis": [
+          -1,
+          0,
+          0
+        ],
+        "yaxis": [
+          0,
+          1,
+          0
+        ]
       },
       "stack_offset_z": 25
     },
     "large_1": {
       "category": "large",
-      "capacity": 12,
-      "count": 12,
+      "capacity": 23,
+      "count": 23,
       "wobj": "ob_HSLU_Pick_large",
       "extax": 0,
       "base_frame": {
-        "point": [504, 697, -472.5],
-        "xaxis": [-1, 0, 0],
-        "yaxis": [0, 1, 0]
+        "point": [
+          504,
+          697,
+          -472.5
+        ],
+        "xaxis": [
+          -1,
+          0,
+          0
+        ],
+        "yaxis": [
+          0,
+          1,
+          0
+        ]
       },
       "stack_offset_z": 25
     }
   },
-  "last_updated": "2026-03-26T00:00:00.000000"
+  "last_updated": "2026-04-25T08:49:50.563399"
 }

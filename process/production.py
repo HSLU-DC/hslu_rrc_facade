@@ -40,8 +40,8 @@ GLUE_VALVE_ENABLED = True     # Glue valve on/off control
 SIM_BEAMS = True             # Beam visualization in RobotStudio (virtual only)
 
 LAYER    = 0      # Layer index (0 or 1)
-N_RUNS   = 10      # Number of elements to produce per run
-START_I  = 0      # Start element index
+N_RUNS   = 1      # Number of elements to produce per run
+START_I  = 15      # Start element index
 
 
 def check_wood_storage(data, layer_idx, start_i, n_runs):
