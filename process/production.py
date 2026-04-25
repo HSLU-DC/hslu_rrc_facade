@@ -1,8 +1,43 @@
 # production.py
-"""Main production script for facade element fabrication.
+"""Main production orchestrator for the Facade FS26 robot cell.
 
-Pipeline: Pick -> Cut -> Glue -> Place
+This script controls the full fabrication workflow for timber facade element
+assembly. Each beam goes through 4 stations in sequence:
+
+    1. PICK   — Retrieve beam from wood storage (WoodStorage inventory system)
+    2. CUT    — Cut beam to length at circular saw station (2 cuts per beam)
+    3. GLUE   — Apply adhesive with Robatech glue system (PLC-controlled)
+    4. PLACE  — Place beam onto facade frame (track-compensated approach)
+
+The fabrication data (positions, sizes, orientations) is exported from
+Grasshopper as JSON (see design/simulation/ExportFacade.py) and organized
+in layers. Each layer contains multiple elements (beams).
+
+Usage:
+    1. Start Docker (cd docker && docker-compose -f REAL-docker-compose.yml up -d)
+    2. Configure RUN CONFIG below
+    3. Run: python production.py
+
+Configuration:
+    - Enable/disable individual stations with DO_PICK, DO_CUT, etc.
+    - Set LAYER to select which layer from fab_data (0 or 1, MAX_LAYERS=2)
+    - Set N_RUNS for how many beams to process per run
+    - Set START_I to skip already-placed beams
+    - Hardware flags (CSS_ENABLED, SAW_ENABLED, GLUE_VALVE_ENABLED)
+      allow testing motion paths without activating tools
+    - SIM_BEAMS drives the BeamSimulator SmartComponent in RobotStudio
+      (virtual controller only — has no effect on the real cell)
+
+Validation:
+    Two-stage validation runs before any robot motion:
+    1. validate.py checks fab_data structure, bounds, cut angles
+    2. Per-element validation checks each beam in the planned range
+    Production aborts if any check fails.
 """
+
+# ==============================
+# Imports
+# ==============================
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -29,29 +64,43 @@ except ImportError:
 # ==============================
 # RUN CONFIG
 # ==============================
+# Station toggles — set to False to skip a station (robot still moves between stations)
 DO_PICK  = True
 DO_CUT   = True
 DO_GLUE  = True
 DO_PLACE = True
 
-CSS_ENABLED = True           # Soft Servo (CSS) for compliant gripping
-SAW_ENABLED = True            # Saw on/off control
-GLUE_VALVE_ENABLED = True     # Glue valve on/off control
-SIM_BEAMS = True             # Beam visualization in RobotStudio (virtual only)
+# Hardware toggles — False = dry-run motion without tool activation
+CSS_ENABLED = True            # Cartesian Soft Servo for gentle gripping at pick
+SAW_ENABLED = True            # Circular saw on/off during cut moves
+GLUE_VALVE_ENABLED = True     # Glue valve pulsing during glue moves
+SIM_BEAMS = True              # BeamSimulator SmartComponent (virtual controller only)
 
-LAYER    = 0      # Layer index (0 or 1)
-N_RUNS   = 1      # Number of elements to produce per run
-START_I  = 15      # Start element index
+# Production range
+LAYER    = 0      # Which layer from fab_data (0 or 1)
+N_RUNS   = 10     # How many beams to process per run
+START_I  = 0      # Start index within the layer (skip already placed beams)
 
 
 def check_wood_storage(data, layer_idx, start_i, n_runs):
-    """Check wood storage before production start.
+    """Pre-flight check: verify wood storage has enough beams for the planned run.
+
+    Interactive prompt: asks the operator whether the storage was refilled.
+    If yes, resets all compartment counts to full capacity. Then checks
+    whether the required beam sizes (small/large) are available.
+
+    Args:
+        data: Loaded fab_data dict (from fabdata.load_data())
+        layer_idx: Which layer to check elements from
+        start_i: Starting element index
+        n_runs: Number of elements planned for this run
 
     Returns:
-        True if enough wood, False if not
+        True if enough beams are available, False otherwise (aborts production)
     """
     storage = WoodStorage()
 
+    # Ask operator first
     print("\n" + "=" * 50)
     print("HOLZLAGER CHECK")
     print("=" * 50)
@@ -63,6 +112,7 @@ def check_wood_storage(data, layer_idx, start_i, n_runs):
     else:
         print(f"[INFO] Eingabe war '{response}' - Lager NICHT zurueckgesetzt.")
 
+    # Show status (after potential refill)
     storage.print_status()
 
     # Count required beams per category
@@ -76,7 +126,7 @@ def check_wood_storage(data, layer_idx, start_i, n_runs):
             return False
         required[beam_size] += 1
 
-    # Compare with available stock
+    # Compare with available inventory
     status = storage.get_status()
     missing = {}
     for cat, count in required.items():
@@ -96,7 +146,21 @@ def check_wood_storage(data, layer_idx, start_i, n_runs):
 
 
 def main(*, dry_run=False):
-    """Main production loop."""
+    """Run the production loop.
+
+    Workflow:
+        1. Load fabrication data from JSON, run validation
+        2. Check wood storage inventory (interactive, skipped in dry_run)
+        3. Connect to robot via ROS bridge, optionally reset SimBeam state
+        4. Loop over elements: PICK -> CUT -> GLUE -> PLACE
+        5. Move to safe end position, disconnect
+
+    Args:
+        dry_run: If True, simulates the entire workflow without robot
+                 connection. All stations print their planned moves
+                 instead of executing them. Useful for verifying
+                 fab_data before running on the real robot.
+    """
 
     # ==============================
     # 1. Load & Validate Data
@@ -210,7 +274,7 @@ def main(*, dry_run=False):
     # 5. Cleanup
     # ==============================
     if not dry_run and r1 is not None:
-        # Move to safe position
+        # Move to safe position after all elements are placed
         r1.send_and_wait(cm.MoveToJoints([-40, 20, 0, 0, 70, -40], [500], 1, rrc.Zone.Z50))
 
     if not dry_run and ros is not None:
@@ -223,4 +287,4 @@ def main(*, dry_run=False):
 
 
 if __name__ == "__main__":
-    main(dry_run=False)
+    main(dry_run=False)  # Set True to simulate without robot connection
