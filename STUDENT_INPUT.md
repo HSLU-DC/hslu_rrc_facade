@@ -66,7 +66,7 @@ Die Mittelachse des **fertigen** (zugeschnittenen) Balkens als Linie. Die Center
 Die Centerline bestimmt automatisch:
 - Die **Platzierungsposition** (Mittelpunkt der Centerline)
 - Die **Platzierungsrichtung** (Richtung der Centerline)
-- Die **beam_size** (Länge der Centerline bestimmt ob "small" oder "large" Holz aus dem Lager geholt wird)
+- Die **beam_size** (Länge der Centerline bestimmt aus welchem Lager das Holz geholt wird: 400, 550, 750 oder 1000 mm)
 
 <img src="docs/images/03_centerline.png" width="600">
 

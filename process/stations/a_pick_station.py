@@ -2,13 +2,14 @@
 """Station A: Pick beam from wood storage.
 
 Retrieves a timber beam from the WoodStorage inventory system. The storage
-has compartments for 2 beam sizes (small, large), each at a different
-track position. Beams are stacked vertically, so the pick frame Z-offset
-depends on how many beams remain in the compartment.
+has compartments for 4 stock lengths (400, 550, 750, 1000 mm), each at a
+different track position. Beams are stacked vertically, so the pick frame
+Z-offset depends on how many beams remain in the compartment.
 
 Physical setup:
-    - Small beams: extax=1000mm, wobj=ob_HSLU_Pick_small
-    - Large beams: extax=0mm,    wobj=ob_HSLU_Pick_large
+    - One wobj per category: ob_HSLU_Pick_400 / _550 / _750 / _1000
+    - Track positions (extax) and base_frames are configured in
+      process/data/wood_storage.json
 
 Motion sequence:
     1. Open gripper
@@ -77,9 +78,12 @@ def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True,
     # changed from refill_all() or a previous pick in the same run)
     storage = WoodStorage()
 
-    # Get beam size from element
+    # Get beam size from element. validate.py rejects elements without a
+    # valid beam_size before we get here; if the field is still missing,
+    # let storage.get_pick_frame() raise with a clear "Ungueltige Kategorie"
+    # error rather than silently picking wrong stock.
     element = get_element(data, i, layer_idx=layer_idx)
-    beam_size = element.get("beam_size", "small").strip('"').strip("'")
+    beam_size = element.get("beam_size", "").strip('"').strip("'")
 
     # Get pick frame from storage
     pick_frame, compartment_id, wobj, extax = storage.get_pick_frame(beam_size)

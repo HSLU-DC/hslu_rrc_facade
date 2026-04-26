@@ -16,14 +16,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _skills.fabdata import load_data, has_layers, get_layer_count, get_element_count, get_element
 from globals import FRAME_WIDTH, FRAME_LENGTH, BEAM_SECTION, MAX_LAYERS
 
-# Valid beam size categories
-VALID_BEAM_SIZES = ("small", "large")
+# Valid beam size categories (length in mm). Must match VALID_CATEGORIES
+# in process/_skills/WoodStorage/wood_storage.py and STOCK_LENGTHS in
+# design/simulation/ExportFacade.py.
+VALID_BEAM_SIZES = ("400", "550", "750", "1000")
 
-# Maximum beam lengths per category (mm)
-# These are approximate stock lengths - actual max depends on cut angles
+# Maximum beam lengths per category (mm). The category name IS the stock
+# length, so a beam labeled "550" must have a finished length <= 550mm.
 MAX_BEAM_LENGTH = {
-    "small": 700,   # TODO: verify with actual stock
-    "large": 1300,  # TODO: verify with actual stock
+    "400": 400,
+    "550": 550,
+    "750": 750,
+    "1000": 1000,
 }
 
 # Minimum beam length (mm)

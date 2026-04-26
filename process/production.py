@@ -46,7 +46,7 @@ import compas_rrc as rrc
 
 from _skills.fabdata import load_data, has_layers, get_layer_count, get_element_count, get_element
 from _skills.SimBeam import sim_beam_reset
-from _skills.WoodStorage.wood_storage import WoodStorage
+from _skills.WoodStorage.wood_storage import WoodStorage, VALID_CATEGORIES
 from globals import ROBOT_NAME, TOOL_GRIPPER, MAX_LAYERS
 import _skills.custom_motion as cm
 
@@ -116,11 +116,11 @@ def check_wood_storage(data, layer_idx, start_i, n_runs):
     storage.print_status()
 
     # Count required beams per category
-    required = {"small": 0, "large": 0}
+    required = {cat: 0 for cat in VALID_CATEGORIES}
     for k in range(n_runs):
         i = start_i + k
         element = get_element(data, i, layer_idx=layer_idx)
-        beam_size = element.get("beam_size", "small").strip('"').strip("'")
+        beam_size = element.get("beam_size", "").strip('"').strip("'")
         if beam_size not in required:
             print(f"\n[FEHLER] Unbekannte beam_size: '{beam_size}' bei Element {i}")
             return False

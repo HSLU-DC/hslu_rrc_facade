@@ -1,8 +1,9 @@
 # wood_storage.py
 """Wood storage inventory management system.
 
-Manages multiple compartments for different beam sizes (small, large).
-Each compartment holds stacked beams and tracks inventory count.
+Manages multiple compartments for different beam sizes (length-keyed:
+"400", "550", "750", "1000" mm stock lengths). Each compartment holds
+stacked beams and tracks inventory count.
 
 Round-robin logic ensures even distribution across compartments of the same category.
 """
@@ -15,7 +16,10 @@ from typing import Optional
 
 from compas.geometry import Frame, Point, Vector
 
-VALID_CATEGORIES = ("small", "large")
+# Beam size categories keyed by stock length (mm). Order matters for status
+# output. Must match VALID_BEAM_SIZES in validate.py and STOCK_LENGTHS in
+# design/simulation/ExportFacade.py.
+VALID_CATEGORIES = ("400", "550", "750", "1000")
 
 
 class WoodStorage:
@@ -68,7 +72,7 @@ class WoodStorage:
         to ensure even distribution across all compartments of the category.
 
         Args:
-            category: Beam category ("small" or "large")
+            category: Beam category (one of VALID_CATEGORIES, e.g. "400")
 
         Returns:
             Tuple of (pick_frame, compartment_id, wobj, extax)
@@ -176,10 +180,10 @@ class WoodStorage:
         """Get work object name for a beam category.
 
         Args:
-            category: Beam category ("small" or "large")
+            category: Beam category (one of VALID_CATEGORIES)
 
         Returns:
-            Work object name (e.g. "ob_HSLU_Pick_small")
+            Work object name (e.g. "ob_HSLU_Pick_400")
         """
         for compartment in self.data["compartments"].values():
             if compartment["category"] == category:
@@ -190,7 +194,7 @@ class WoodStorage:
         """Get external axis (track) position for a beam category.
 
         Args:
-            category: Beam category ("small" or "large")
+            category: Beam category (one of VALID_CATEGORIES)
 
         Returns:
             Track position in mm
@@ -204,11 +208,12 @@ class WoodStorage:
         """Get overview of all compartments.
 
         Returns:
-            Dict with category totals and per-compartment details
+            Dict with category totals and per-compartment details.
+            Keys come from VALID_CATEGORIES (insertion-ordered).
         """
         status = {
-            "small": {"total": 0, "available": 0, "compartments": {}},
-            "large": {"total": 0, "available": 0, "compartments": {}},
+            cat: {"total": 0, "available": 0, "compartments": {}}
+            for cat in VALID_CATEGORIES
         }
 
         for cid, c in self.data["compartments"].items():
@@ -232,9 +237,9 @@ class WoodStorage:
         print("HOLZLAGER STATUS")
         print("=" * 50)
 
-        for category in ["small", "large"]:
+        for category in VALID_CATEGORIES:
             cat_status = status[category]
-            print(f"\n{category.upper()}:")
+            print(f"\n{category} mm:")
             print(f"  Available: {cat_status['available']} / {cat_status['total']}")
             for cid, cs in cat_status["compartments"].items():
                 bar = "#" * cs["count"] + "-" * (cs["capacity"] - cs["count"])

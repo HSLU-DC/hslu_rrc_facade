@@ -27,7 +27,7 @@
 #   8  = cut_position_b    << Frame (in ob_HSLU_Cut coordinates)
 #   9  = glue_position_a   << Frame (in ob_HSLU_Glue coordinates)
 #   10 = glue_position_b   << Frame (in ob_HSLU_Glue coordinates, can be null)
-#   11 = beam_size         << String ("small" or "large")
+#   11 = beam_size         << String, one of "400" / "550" / "750" / "1000"
 #
 # ==============================================================================
 # OUTPUT
@@ -84,7 +84,15 @@ CUT_PLANE_B_INDEX = 3
 # Geometry configuration
 # ==============================================================================
 BEAM_SECTION = 25.0                        # mm (must match globals.py)
-STOCK_LENGTHS = {"small": 700.0, "large": 1300.0}  # mm per beam_size
+# Stock lengths per beam_size category (must match VALID_CATEGORIES in
+# process/_skills/WoodStorage/wood_storage.py).
+STOCK_LENGTHS = {
+    "400":  400.0,
+    "550":  550.0,
+    "750":  750.0,
+    "1000": 1000.0,
+}
+VALID_BEAM_SIZES = tuple(STOCK_LENGTHS.keys())
 MESH_MIN_EDGE = 0.5
 MESH_MAX_EDGE = 50.0
 SPLIT_TOLERANCE = 0.01
@@ -222,7 +230,7 @@ def to_plane_geom(item):
 # ==============================================================================
 
 def get_stock_length(size):
-    return STOCK_LENGTHS.get(size, STOCK_LENGTHS["small"])
+    return STOCK_LENGTHS.get(size, STOCK_LENGTHS["400"])
 
 
 def make_grip_frame(centerline):
@@ -364,8 +372,9 @@ def validate_element_basic(element, layer_idx, elem_idx):
             warnings.append("{}: '{}' fehlt!".format(prefix, field))
 
     beam_size = element.get("beam_size", "")
-    if beam_size not in ("small", "large"):
-        warnings.append("{}: beam_size '{}' ungueltig (nur 'small' oder 'large')".format(prefix, beam_size))
+    if beam_size not in VALID_BEAM_SIZES:
+        warnings.append("{}: beam_size '{}' ungueltig (erlaubt: {})".format(
+            prefix, beam_size, ", ".join(VALID_BEAM_SIZES)))
 
     place = element.get("place_position")
     if place is not None:
@@ -395,7 +404,7 @@ def export_element_stls(branch, beam_size, layer_idx, elem_idx, geometry_folder)
         errors.append("{} STL: missing brep/centerline/cut_plane_a".format(prefix))
         return 0, errors
 
-    if beam_size not in ("small", "large"):
+    if beam_size not in VALID_BEAM_SIZES:
         errors.append("{} STL: invalid beam_size '{}'".format(prefix, beam_size))
         return 0, errors
 

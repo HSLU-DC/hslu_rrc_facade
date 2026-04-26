@@ -175,8 +175,10 @@ def b_cut_station(r1, data, i, *, layer_idx=0, dry_run=False, saw_enabled=True, 
     cut_a_frame = element["cut_position_a"]
     cut_b_frame = element["cut_position_b"]
 
-    # Get beam size and track position from pick station
-    beam_size = element.get("beam_size", "small").strip('"').strip("'")
+    # Get beam size and track position from pick station. validate.py
+    # already enforces a valid beam_size; missing/unknown values surface
+    # as a "Unknown category" ValueError from storage.get_extax().
+    beam_size = element.get("beam_size", "").strip('"').strip("'")
     pick_extax = storage.get_extax(beam_size)
 
     # When the track moves from pick position to cut position, the beam's

@@ -17,7 +17,6 @@ design/
   hslu_rrc_facade.3dm        # Rhino file (not in git, too large)
   simulation/
     ExportFacade.py          # GH component: writes fab_data JSON + 3 STLs per element
-    ExportSimGeometry.py     # (legacy standalone STL exporter, superseded by ExportFacade)
 
 docs/
   images/                    # Documentation images
@@ -47,7 +46,7 @@ process/                     # (Work in Progress)
     GluePLC/                 # PLC safety handshake for glue system
     SimBeam/                 # Virtual-only: drives BeamSimulator SmartComponent via EIO
     SoftAct/                 # Compliant servo for soft gripping/pressing
-    WoodStorage/             # Inventory management (small/large categories, round-robin pick)
+    WoodStorage/             # Inventory management (4 length categories: 400/550/750/1000, round-robin pick)
 
   stations/                  # Station implementations (DO NOT MODIFY for students)
     a_pick_station.py        # CSS grip from dynamic storage
@@ -80,7 +79,7 @@ Frame bounds: X = 0..2500mm, Y = -600..0mm. Origin = top-left of frame.
 ## Key Differences from Swissbau26
 - No label station (c_lable_station removed)
 - No Layer 2 / diagonal code (all diagonal logic removed from every station)
-- Only 2 beam categories: small, large (no medium)
+- 4 beam categories keyed by stock length (mm): "400", "550", "750", "1000"
 - 25x25mm beams (not 40x40mm) → stack_offset_z = 25, grip load = 0.3kg
 - Place station computes approach frames from place_position only (students don't provide pre-app, app, rot frames)
 - Glue: student provides plane, robot drives predefined path pattern
@@ -94,7 +93,7 @@ Frame bounds: X = 0..2500mm, Y = -600..0mm. Origin = top-left of frame.
     "id": 0,
     "elements": [{
       "id": 0,
-      "beam_size": "small|large",
+      "beam_size": "400|550|750|1000",
       "place_position": Frame,
       "cut_position_a": Frame,
       "cut_position_b": Frame,
@@ -133,7 +132,7 @@ ros.terminate()
 | `r_HSLU_SimBeam*` | Virtual-only: drive BeamSimulator SmartComponent (Activate/SwapCutA/SwapCutB/Release/Reset) |
 
 ## Workobjects
-- `ob_HSLU_Pick_small` / `ob_HSLU_Pick_large` — Pick station (defined in wood_storage.json)
+- `ob_HSLU_Pick_400` / `_550` / `_750` / `_1000` — Pick station, one wobj per stock length (defined in wood_storage.json)
 - `ob_HSLU_Cut` — Cut station
 - `ob_HSLU_Glue` — Glue station
 - `ob_HSLU_Place` — Place station (= World coordinate system, OFFSET_TRACK = 593mm)
@@ -172,7 +171,6 @@ Two-stage validation prevents crashes:
 
 ## Known TODOs
 - Joint positions need teaching at the machine (search for `TODO: verify`)
-- Wood storage base_frame Z values need verification for 25mm cross-section
+- Wood storage base_frames + extax for the 4 new compartments (400/550/750/1000) need to be measured at the machine and entered in wood_storage.json
 - Place station dynamic offset may need recalibration for facade frame
-- beam_size threshold (small vs large) needs to be defined based on actual stock lengths
 - process/ code is WIP — stations need testing on real hardware
