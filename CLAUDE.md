@@ -4,7 +4,7 @@
 Robotic facade element production for 9 student groups. ABB Gofa CRB 15000 + Güdel Track.
 Pipeline: Grasshopper (Design) → JSON Export → Python + compas_rrc → OmniCore Controller.
 
-Based on the Swissbau26 project (`C:\Users\jurij\Documents\GitHub\hslu_rrc_Swissbau26`), simplified for student use.
+Based on the Swissbau26 project (`C:\Users\jurij\Documents\GitHub_HSLU\hslu_rrc_Swissbau26`), simplified for student use.
 
 ## Architecture
 
