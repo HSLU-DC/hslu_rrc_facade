@@ -49,6 +49,14 @@ jp_park = Jointtarget([180, -30, 75, 0, 45, 90], [0.0])     # Park (compact, tra
 jp_pick = Jointtarget([-53.13, 44.33, 9.19, 0.38, 36.05, -53.1], [1000.0])
 jp_cut = Jointtarget([-50, 20, 40, 0, 30, -50], [500.0])
 jp_glue = Jointtarget([-33.61, 7.22, 58.23, 0.0, 24.55, -33.61], [500.0])
+# Glue rotation transit: TCP points -Z and the beam is held high above the
+# robot arm, so J6 can rotate freely without self-collision. Used as the
+# entry/exit pose around each glue plane (see d_glue_station._do_glue_sequence).
+jp_glue_rot = Jointtarget([-70, 35, -15, 179, 110, -20], [1000.0])
+# Intermediate waypoint between jp_glue and jp_glue_rot. The direct path
+# between them would sweep the held beam through the robot arm; this pose
+# splits the trajectory into two safe steps. Used at glue station entry/exit.
+jp_glue_transit = Jointtarget([-75, 25, 20, 100, 80, -135], [1000.0])
 jp_pre_app_place = Jointtarget([-30, 0, 25, 0, 65, -30], [500.0])  # TODO: verify
 jp_app_place = Jointtarget([15, 0, 25, 0, 65, 15], [500.0])        # TODO: verify
 jp_place = Jointtarget([50, 0, 30, 0, 65, 45], [700.0])            # TODO: verify

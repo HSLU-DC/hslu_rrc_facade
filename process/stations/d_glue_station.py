@@ -12,13 +12,6 @@ pass + return pass with Y offset for a double bead).
 
 Glue application is executed entirely in RAPID (r_RRC_CI_GlueLine) to
 avoid Python-ROS-RAPID latency — this ensures consistent glue bead quality.
-
-POS vs NEG dispatch:
-    Beams can face either direction. The station automatically detects the
-    orientation by computing the frame's Z-axis (cross product of X x Y) and
-    comparing it against a reference direction (Y+). This determines whether
-    to use the POS or NEG motion sequence, which differ in approach angles
-    and wrist rotation resets.
 """
 
 # ==============================
@@ -31,7 +24,6 @@ if _parent not in sys.path:
     sys.path.insert(0, _parent)
 
 import compas_rrc as rrc
-from compas.geometry import Vector
 
 import _skills.custom_motion as cm
 from _skills.fabdata import load_data, get_element
@@ -43,22 +35,10 @@ from globals import (
     SPEED_WITH_MEMBER, SPEED_APPROACH, SPEED_GLUE, SPEED_NO_MEMBER,
     W_OBJ_GLUE,
 )
-from joint_positions import jp_glue
+from joint_positions import jp_glue, jp_glue_rot, jp_glue_transit
 
 # Duration in seconds for coordinated (track + robot) moves
-COORD_MOVE_TIME = 2
-
-# ==============================================================================
-# AUTO DISPATCH: POS vs NEG sequence selection
-# ==============================================================================
-# The glue station needs different approach sequences depending on which
-# direction the beam faces. We compute the frame's Z-axis via cross product
-# (X x Y) and compare it to this reference direction using dot product.
-# If the dot product is >= 0, we use the POS sequence; otherwise NEG.
-SEQ_REF = Vector(0, 1, 0)
-
-# Small epsilon for numerical stability during normalization
-EPS = 1e-6
+COORD_MOVE_TIME = 1
 
 
 # ==============================================================================
@@ -66,32 +46,15 @@ EPS = 1e-6
 # ==============================================================================
 
 def _computed_zaxis(frame):
-    """Robust z-axis calculation.
-
-    We compute z explicitly via x cross y, instead of relying on frame.zaxis
-    (which can differ depending on how the frame was constructed).
-    """
+    """Robust z-axis: x cross y. Used for dry_run debug output."""
     z = frame.xaxis.cross(frame.yaxis)
-    if z.length > EPS:
+    if z.length > 1e-6:
         z.unitize()
     return z
 
 
-def _pick_sequence_by_z(frame, *, ref=SEQ_REF):
-    """Decide which sequence to run based on z_calc . ref.
-
-    Returns:
-        seq: "POS" or "NEG"
-        z:   computed z-axis (unit vector if possible)
-        d:   dot product z . ref
-    """
-    z = _computed_zaxis(frame)
-    d = z.dot(ref)
-    return ("POS", z, d) if d >= 0 else ("NEG", z, d)
-
-
 def _build_offset_frames(start_frame):
-    """Build the intermediate helper frames used by both POS and NEG sequences.
+    """Build the intermediate helper frames around the glue start position.
 
     Returns:
         pre: Pre-approach frame (Z+300, X+300, Y-50 from start)
@@ -101,17 +64,17 @@ def _build_offset_frames(start_frame):
     pre = start_frame.copy()
     pre.point.z += 300
     pre.point.x += 300
-    pre.point.y -= 50
+    #pre.point.y -= 50
 
     app = start_frame.copy()
     app.point.z += 50
     app.point.x += 50
-    app.point.y -= 50
+    #app.point.y -= 50
 
     ret = start_frame.copy()
     ret.point.z += 100
     ret.point.x += 100
-    ret.point.y -= 50
+    #ret.point.y -= 50
 
     return pre, app, ret
 
@@ -169,11 +132,14 @@ def _run_glue_line(r1, glue_frame, *, glue_valve_enabled=True, x_offset=-30,
 
 
 # ==============================================================================
-# POS / NEG Sequences
+# Glue sequence
 # ==============================================================================
 
-def _do_glue_sequence_pos(r1, glue_frame, *, dry_run=False, tag="", glue_valve_enabled=True):
-    """POS glue sequence: pre -> app -> start -> glue line -> ret -> pre -> J6 reset.
+def _do_glue_sequence(r1, glue_frame, *, dry_run=False, tag="", glue_valve_enabled=True):
+    """app -> start -> glue line -> ret -> jp_glue_rot.
+
+    Precondition: caller MUST position the robot at jp_glue_rot before calling.
+    Postcondition: robot is left at jp_glue_rot, ready for the next plane or exit.
 
     Args:
         r1: AbbClient instance
@@ -188,20 +154,23 @@ def _do_glue_sequence_pos(r1, glue_frame, *, dry_run=False, tag="", glue_valve_e
 
     if dry_run:
         z_calc = _computed_zaxis(glue_frame)
-        print(f"{prefix}seq=POS | z_calc={z_calc}")
+        print(f"{prefix}z_calc={z_calc}")
+        print(f"{prefix}  rot joints: {jp_glue_rot.robax} extax={jp_glue_rot.extax}")
         print(f"{prefix}  pre:   X={pre.point.x:.0f} Y={pre.point.y:.0f} Z={pre.point.z:.0f}")
         print(f"{prefix}  app:   X={app.point.x:.0f} Y={app.point.y:.0f} Z={app.point.z:.0f}")
         print(f"{prefix}  start: X={glue_frame.point.x:.0f} Y={glue_frame.point.y:.0f} Z={glue_frame.point.z:.0f}")
         print(f"{prefix}  ret:   X={ret.point.x:.0f} Y={ret.point.y:.0f} Z={ret.point.z:.0f}")
         return
 
-    print(f"{prefix}Executing POS glue sequence.")
+    print(f"{prefix}Executing glue sequence.")
 
-    # Move to pre-approach
-    r1.send(rrc.MoveToFrame(pre, SPEED_WITH_MEMBER, rrc.Zone.Z200, rrc.Motion.LINEAR))
+    # Caller has already positioned us at jp_glue_rot (a safe rotation pose
+    # where J6 can rotate freely without beam-arm collision). After A's
+    # sequence ends at jp_glue_rot, B's sequence reuses that state without
+    # an extra coord move.
 
     # Move to approach
-    r1.send(rrc.MoveToFrame(app, SPEED_WITH_MEMBER, rrc.Zone.Z10, rrc.Motion.LINEAR))
+    r1.send_and_wait(cm.MoveToRobtarget(app, jp_glue.extax, 2, rrc.Zone.Z10, rrc.Motion.LINEAR))
 
     # Move to start (fine)
     r1.send_and_wait(rrc.MoveToFrame(glue_frame, SPEED_APPROACH, rrc.Zone.FINE, rrc.Motion.LINEAR))
@@ -211,80 +180,11 @@ def _do_glue_sequence_pos(r1, glue_frame, *, dry_run=False, tag="", glue_valve_e
 
     # Retract + go back to pre position
     r1.send(rrc.MoveToFrame(ret, SPEED_WITH_MEMBER, rrc.Zone.Z10, rrc.Motion.LINEAR))
-    r1.send(rrc.MoveToFrame(pre, SPEED_WITH_MEMBER, rrc.Zone.Z50, rrc.Motion.LINEAR))
+    #r1.send_and_wait(rrc.MoveToFrame(pre, SPEED_WITH_MEMBER, rrc.Zone.Z50, rrc.Motion.LINEAR))
 
-    # Reset wrist rotation (J6) by reading current joints and setting robax[5] = 0
-    robax, extax = r1.send_and_wait(rrc.GetJoints())
-    robax[5] = 0
-    r1.send(rrc.MoveToJoints(robax, [], SPEED_WITH_MEMBER, rrc.Zone.Z50))
-
-
-def _do_glue_sequence_neg(r1, glue_frame, *, dry_run=False, tag="", is_second=False, glue_valve_enabled=True):
-    """NEG glue sequence: pre -> app -> start -> glue line -> ret -> joint reset.
-
-    The joint reset at the end depends on which call this is:
-        - First call (A): two joint moves to navigate around singularity
-        - Second call (B): single joint move (already on the right side)
-
-    Args:
-        r1: AbbClient instance
-        glue_frame: Start frame for the glue line
-        dry_run: If True, prints planned moves only
-        tag: Label used in print statements ("A" or "B")
-        is_second: True if this is the second glue call (B)
-        glue_valve_enabled: If True, opens/closes glue valve during path
-    """
-    pre, app, ret = _build_offset_frames(glue_frame)
-
-    prefix = f"[GLUE {tag}] " if tag else "[GLUE] "
-
-    if dry_run:
-        z_calc = _computed_zaxis(glue_frame)
-        print(f"{prefix}seq=NEG | z_calc={z_calc} | is_second={is_second}")
-        print(f"{prefix}  pre:   X={pre.point.x:.0f} Y={pre.point.y:.0f} Z={pre.point.z:.0f}")
-        print(f"{prefix}  app:   X={app.point.x:.0f} Y={app.point.y:.0f} Z={app.point.z:.0f}")
-        print(f"{prefix}  start: X={glue_frame.point.x:.0f} Y={glue_frame.point.y:.0f} Z={glue_frame.point.z:.0f}")
-        print(f"{prefix}  ret:   X={ret.point.x:.0f} Y={ret.point.y:.0f} Z={ret.point.z:.0f}")
-        return
-
-    print(f"{prefix}Executing NEG glue sequence.")
-
-    # Move to pre-approach
-    r1.send(rrc.MoveToFrame(pre, SPEED_WITH_MEMBER, rrc.Zone.Z200, rrc.Motion.LINEAR))
-
-    # Move to approach
-    r1.send(rrc.MoveToFrame(app, SPEED_WITH_MEMBER, rrc.Zone.Z10, rrc.Motion.LINEAR))
-
-    # Move to start (fine)
-    r1.send_and_wait(rrc.MoveToFrame(glue_frame, SPEED_APPROACH, rrc.Zone.FINE, rrc.Motion.LINEAR))
-
-    # Execute glue line - all in RAPID (move + pulse + move back)
-    _run_glue_line(r1, glue_frame, glue_valve_enabled=glue_valve_enabled)
-
-    # Retract
-    r1.send(rrc.MoveToFrame(ret, SPEED_WITH_MEMBER, rrc.Zone.Z10, rrc.Motion.LINEAR))
-
-    # Joint moves at the end (depends on whether this is the second call / B)
-    if is_second:
-        # ONLY second call (B): single joint move
-        r1.send(rrc.MoveToJoints([-40, -5, 40, 0, 55, -130], [], SPEED_WITH_MEMBER, rrc.Zone.Z10))
-    else:
-        # First call (A): two joint moves
-        r1.send(rrc.MoveToJoints([-40, -5, 40, 0, 55, 50], [], SPEED_WITH_MEMBER, rrc.Zone.Z10))
-        r1.send(rrc.MoveToJoints([-40, -5, 40, 0, 55, -130], [], SPEED_WITH_MEMBER, rrc.Zone.Z10))
-
-
-def _do_glue_sequence_auto(r1, glue_frame, *, dry_run=False, tag="", is_second=False, glue_valve_enabled=True):
-    """Auto-dispatch: decide POS vs NEG based on computed z-axis direction."""
-    seq, z, d = _pick_sequence_by_z(glue_frame)
-
-    if dry_run:
-        prefix = f"[GLUE {tag}] " if tag else "[GLUE] "
-        print(f"{prefix}DISPATCH seq={seq} | dot={d:.3f} | valve={glue_valve_enabled}")
-
-    if seq == "POS":
-        return _do_glue_sequence_pos(r1, glue_frame, dry_run=dry_run, tag=tag, glue_valve_enabled=glue_valve_enabled)
-    return _do_glue_sequence_neg(r1, glue_frame, dry_run=dry_run, tag=tag, is_second=is_second, glue_valve_enabled=glue_valve_enabled)
+    # Return to safe rotation pose. Replaces the old J6=0 reset: the beam ends
+    # up high above the arm, ready for the next glue plane or station exit.
+    r1.send_and_wait(cm.MoveToJoints(jp_glue_rot.robax, jp_glue_rot.extax, COORD_MOVE_TIME, rrc.Zone.FINE))
 
 
 # ==============================================================================
@@ -294,8 +194,7 @@ def _do_glue_sequence_auto(r1, glue_frame, *, dry_run=False, tag="", is_second=F
 def d_glue_station(r1, data, i, *, layer_idx=0, dry_run=False, glue_valve_enabled=True):
     """Apply adhesive to beam at glue positions A and (optionally) B.
 
-    Auto-dispatches POS or NEG sequence based on beam orientation. The PLC
-    safety handshake (glue_on/glue_off) brackets the entire operation —
+    The PLC safety handshake (glue_on/glue_off) brackets the entire operation —
     the glue system is only active while the robot is in the glue station.
 
     Args:
@@ -321,15 +220,25 @@ def d_glue_station(r1, data, i, *, layer_idx=0, dry_run=False, glue_valve_enable
         print(f"[GLUE] i={i} layer={layer_idx}")
         glue_on(r1, dry_run=True)
         if glue_a_frame:
-            _do_glue_sequence_auto(r1, glue_a_frame, dry_run=True, tag="A", is_second=False, glue_valve_enabled=glue_valve_enabled)
+            _do_glue_sequence(r1, glue_a_frame, dry_run=True, tag="A", glue_valve_enabled=glue_valve_enabled)
         if glue_b_frame:
-            _do_glue_sequence_auto(r1, glue_b_frame, dry_run=True, tag="B", is_second=True, glue_valve_enabled=glue_valve_enabled)
+            _do_glue_sequence(r1, glue_b_frame, dry_run=True, tag="B", glue_valve_enabled=glue_valve_enabled)
         glue_off(r1, dry_run=True)
         return
 
     # Move to glue station
+    r1.send(
+        cm.MoveToJoints(jp_glue.robax, jp_glue.extax, COORD_MOVE_TIME, rrc.Zone.FINE)
+    )
+    # Transit waypoint on the way to jp_glue_rot. The direct path would sweep
+    # the held beam through the robot arm.
     r1.send_and_wait(
-        cm.MoveToJoints(jp_glue.robax, jp_glue.extax, COORD_MOVE_TIME, rrc.Zone.Z30)
+        cm.MoveToJoints(jp_glue_transit.robax, jp_glue_transit.extax, COORD_MOVE_TIME, rrc.Zone.FINE)
+    )
+    # Position once at jp_glue_rot here so each _do_glue_sequence call can
+    # skip the redundant entry move (A leaves us at rot, B reuses it).
+    r1.send_and_wait(
+        cm.MoveToJoints(jp_glue_rot.robax, jp_glue_rot.extax, COORD_MOVE_TIME, rrc.Zone.FINE)
     )
     print("At glue position.")
 
@@ -341,19 +250,22 @@ def d_glue_station(r1, data, i, *, layer_idx=0, dry_run=False, glue_valve_enable
 
     # A = first call
     if glue_a_frame:
-        _do_glue_sequence_auto(r1, glue_a_frame, tag="A", is_second=False, glue_valve_enabled=glue_valve_enabled)
+        _do_glue_sequence(r1, glue_a_frame, tag="A", glue_valve_enabled=glue_valve_enabled)
 
     # B = second call
     if glue_b_frame:
-        _do_glue_sequence_auto(r1, glue_b_frame, tag="B", is_second=True, glue_valve_enabled=glue_valve_enabled)
+        _do_glue_sequence(r1, glue_b_frame, tag="B", glue_valve_enabled=glue_valve_enabled)
 
     # Turn glue system off
     glue_off(r1)
     print("Glue system disabled.")
 
-    # Leave station
+    # Leave station - transit first, then back to jp_glue
     r1.send_and_wait(
-        cm.MoveToJoints(jp_glue.robax, jp_glue.extax, COORD_MOVE_TIME, rrc.Zone.Z30)
+        cm.MoveToJoints(jp_glue_transit.robax, jp_glue_transit.extax, COORD_MOVE_TIME, rrc.Zone.FINE)
+    )
+    r1.send_and_wait(
+        cm.MoveToJoints(jp_glue.robax, jp_glue.extax, COORD_MOVE_TIME, rrc.Zone.FINE)
     )
     print("Left glue station.")
 
