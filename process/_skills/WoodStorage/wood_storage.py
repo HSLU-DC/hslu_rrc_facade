@@ -18,7 +18,7 @@ from compas.geometry import Frame, Point, Vector
 
 # Beam size categories keyed by stock length (mm). Order matters for status
 # output. Must match VALID_BEAM_SIZES in validate.py and STOCK_LENGTHS in
-# design/simulation/ExportFacade.py.
+# design/gh_python/ExportFacade.py.
 VALID_CATEGORIES = ("400", "550", "750", "1000")
 
 
@@ -175,6 +175,69 @@ class WoodStorage:
 
         self._save()
         print("[STORAGE] All compartments refilled to capacity")
+
+    def set_count(self, category: str, count: int) -> None:
+        """Set total beam count for a category, distributed across its compartments.
+
+        Fills compartments greedily in iteration order: first compartment up to
+        its capacity, overflow goes to the next compartment, and so on.
+
+        Args:
+            category: Beam category (one of VALID_CATEGORIES)
+            count: Total beams to distribute (0..total_capacity)
+
+        Raises:
+            ValueError: If category is unknown or count is out of range
+        """
+        if category not in VALID_CATEGORIES:
+            raise ValueError(
+                f"Ungueltige Kategorie: '{category}'. Erlaubt: {VALID_CATEGORIES}"
+            )
+
+        compartments = [
+            (cid, c) for cid, c in self.data["compartments"].items()
+            if c["category"] == category
+        ]
+
+        total_capacity = sum(c["capacity"] for _, c in compartments)
+        if count < 0:
+            raise ValueError(f"count muss >= 0 sein (got {count})")
+        if count > total_capacity:
+            raise ValueError(
+                f"count {count} ueberschreitet Gesamtkapazitaet {total_capacity} "
+                f"fuer Kategorie '{category}'"
+            )
+
+        remaining = count
+        for cid, c in compartments:
+            c["count"] = min(remaining, c["capacity"])
+            remaining -= c["count"]
+
+        self._save()
+
+    def has_beams(self, category: str) -> bool:
+        """True if at least one beam of this category is available."""
+        return any(
+            c["count"] > 0
+            for c in self.data["compartments"].values()
+            if c["category"] == category
+        )
+
+    def get_capacity(self, category: str) -> int:
+        """Total capacity (sum across compartments) for a category."""
+        return sum(
+            c["capacity"]
+            for c in self.data["compartments"].values()
+            if c["category"] == category
+        )
+
+    def reload(self) -> None:
+        """Re-read inventory data from disk.
+
+        Required when other code (or another WoodStorage instance) has
+        modified the JSON, since each instance caches a copy of the data.
+        """
+        self.data = self._load()
 
     def get_wobj(self, category: str) -> str:
         """Get work object name for a beam category.

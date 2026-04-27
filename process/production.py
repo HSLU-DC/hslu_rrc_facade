@@ -10,7 +10,7 @@ assembly. Each beam goes through 4 stations in sequence:
     4. PLACE  — Place beam onto facade frame (track-compensated approach)
 
 The fabrication data (positions, sizes, orientations) is exported from
-Grasshopper as JSON (see design/simulation/ExportFacade.py) and organized
+Grasshopper as JSON (see design/gh_python/ExportFacade.py) and organized
 in layers. Each layer contains multiple elements (beams).
 
 Usage:
@@ -48,6 +48,7 @@ from _skills.fabdata import load_data, has_layers, get_layer_count, get_element_
 from _skills.SimBeam import sim_beam_reset
 from _skills.WoodStorage.wood_storage import WoodStorage, VALID_CATEGORIES
 from globals import ROBOT_NAME, TOOL_GRIPPER, MAX_LAYERS
+from joint_positions import jp_park
 import _skills.custom_motion as cm
 
 from stations import a_pick_station, b_cut_station, d_glue_station, e_place_station
@@ -82,67 +83,134 @@ N_RUNS   = 10     # How many beams to process per run
 START_I  = 0      # Start index within the layer (skip already placed beams)
 
 
-def check_wood_storage(data, layer_idx, start_i, n_runs):
-    """Pre-flight check: verify wood storage has enough beams for the planned run.
-
-    Interactive prompt: asks the operator whether the storage was refilled.
-    If yes, resets all compartment counts to full capacity. Then checks
-    whether the required beam sizes (small/large) are available.
-
-    Args:
-        data: Loaded fab_data dict (from fabdata.load_data())
-        layer_idx: Which layer to check elements from
-        start_i: Starting element index
-        n_runs: Number of elements planned for this run
-
-    Returns:
-        True if enough beams are available, False otherwise (aborts production)
-    """
-    storage = WoodStorage()
-
-    # Ask operator first
-    print("\n" + "=" * 50)
-    print("HOLZLAGER CHECK")
-    print("=" * 50)
-
-    response = input("\nWurde das Holzlager KOMPLETT aufgefuellt? (j/n): ").strip().lower()
-    if response == 'j':
-        storage.refill_all()
-        print("[OK] Lager auf VOLL gesetzt.")
-    else:
-        print(f"[INFO] Eingabe war '{response}' - Lager NICHT zurueckgesetzt.")
-
-    # Show status (after potential refill)
-    storage.print_status()
-
-    # Count required beams per category
-    required = {cat: 0 for cat in VALID_CATEGORIES}
+def _compute_demand(data, layer_idx, start_i, n_runs):
+    """Count required beams per category for the planned run."""
+    demand = {cat: 0 for cat in VALID_CATEGORIES}
     for k in range(n_runs):
         i = start_i + k
         element = get_element(data, i, layer_idx=layer_idx)
         beam_size = element.get("beam_size", "").strip('"').strip("'")
-        if beam_size not in required:
-            print(f"\n[FEHLER] Unbekannte beam_size: '{beam_size}' bei Element {i}")
-            return False
-        required[beam_size] += 1
+        if beam_size not in demand:
+            return None, beam_size, i
+        demand[beam_size] += 1
+    return demand, None, None
 
-    # Compare with available inventory
-    status = storage.get_status()
-    missing = {}
-    for cat, count in required.items():
-        available = status[cat]["available"]
-        if count > available:
-            missing[cat] = count - available
 
-    if missing:
-        print("\n[FEHLER] NICHT GENUG HOLZ!")
-        for cat, count in missing.items():
-            print(f"  {cat}: {count} Stueck fehlen")
-        print("\nBitte Holzlager auffuellen und neu starten.")
+def _prompt_int(prompt, default, lo, hi):
+    """Prompt for an integer in [lo, hi]. Empty input returns default."""
+    while True:
+        response = input(prompt).strip()
+        if not response:
+            return default
+        try:
+            value = int(response)
+        except ValueError:
+            print("    Bitte Zahl eingeben.")
+            continue
+        if value < lo or value > hi:
+            print(f"    Ungueltig ({lo}..{hi})")
+            continue
+        return value
+
+
+def check_wood_storage(data, layer_idx, start_i, n_runs):
+    """Pre-flight: show design demand, take per-category counts from operator.
+
+    Workflow:
+        1. Compute demand per category from fab_data
+        2. Show demand vs lager capacity (warns if multiple refills will be needed)
+        3. Per category, prompt for actual stock count (default = recommended)
+        4. Write counts back to wood_storage.json
+
+    Categories with zero demand are auto-set to 0 (no prompt).
+
+    Mid-production refills (when a lager runs empty) are handled separately
+    by refill_lager() in the production loop.
+
+    Returns:
+        True on success, False on bad data (unknown beam_size in design)
+    """
+    storage = WoodStorage()
+
+    demand, bad_size, bad_idx = _compute_demand(data, layer_idx, start_i, n_runs)
+    if demand is None:
+        print(f"\n[FEHLER] Unbekannte beam_size: '{bad_size}' bei Element {bad_idx}")
         return False
 
-    print(f"\n[OK] Genug Holz vorhanden fuer {n_runs} Teile")
+    print("\n" + "=" * 50)
+    print("HOLZLAGER KONFIGURATION")
+    print("=" * 50)
+
+    print("\nHolzbedarf laut Design:")
+    for cat in VALID_CATEGORIES:
+        cap = storage.get_capacity(cat)
+        warn = ""
+        if demand[cat] > cap:
+            n_refills = (demand[cat] - 1) // cap
+            warn = f"  -> mind. {n_refills} Auffuellungen waehrend Produktion!"
+        print(f"  {cat} mm: {demand[cat]:>3} Stueck (Lager-Kapazitaet: {cap}){warn}")
+
+    print("\nWieviele Stueck zum Start? (Enter = empfohlener Wert)")
+
+    for cat in VALID_CATEGORIES:
+        cap = storage.get_capacity(cat)
+        if demand[cat] == 0:
+            storage.set_count(cat, 0)
+            continue
+        recommended = min(demand[cat], cap)
+        count = _prompt_int(f"  {cat} mm [{recommended}]: ", recommended, 0, cap)
+        storage.set_count(cat, count)
+
+    print()
+    storage.print_status()
     return True
+
+
+def refill_lager(r1, storage, category, remaining_demand, *, dry_run=False):
+    """Mid-production refill prompt for an empty lager category.
+
+    Parks the robot at jp_park (track retracted, robot folded), then asks
+    the operator how many beams were nachgefuellt. Updates storage counts
+    via storage.set_count(category, n).
+
+    Args:
+        r1: AbbClient instance (or None for dry_run)
+        storage: WoodStorage instance to update
+        category: Empty category that triggered the refill
+        remaining_demand: How many beams of this category are still needed
+                          for the rest of the production run
+        dry_run: If True, skips robot motion (the prompt still runs)
+    """
+    capacity = storage.get_capacity(category)
+    recommended = min(remaining_demand, capacity)
+
+    if not dry_run and r1 is not None:
+        r1.send_and_wait(cm.MoveToJoints(jp_park.robax, jp_park.extax, 2, rrc.Zone.Z50))
+
+    print("\n" + "=" * 50)
+    print(f"  LAGER LEER: {category} mm")
+    print("=" * 50)
+    print(f"\n  Noch benoetigt:    {remaining_demand}")
+    print(f"  Lager-Kapazitaet:  {capacity}")
+    print(f"  Empfohlen jetzt:   {recommended}")
+
+    count = _prompt_int(
+        f"\nWieviele Stueck nachgefuellt? [{recommended}]: ",
+        recommended, 1, capacity,
+    )
+    storage.set_count(category, count)
+    print(f"  [OK] Lager '{category}' auf {count} gesetzt.\n")
+
+
+def _remaining_demand(data, layer_idx, start_k, n_to_run, start_i, category):
+    """Count how many beams of `category` are still needed in the rest of the run."""
+    n = 0
+    for kk in range(start_k, n_to_run):
+        beam = get_element(data, start_i + kk, layer_idx=layer_idx) \
+                  .get("beam_size", "").strip('"').strip("'")
+        if beam == category:
+            n += 1
+    return n
 
 
 def main(*, dry_run=False):
@@ -247,6 +315,11 @@ def main(*, dry_run=False):
     # ==============================
     # 4. Production Loop
     # ==============================
+    # Storage instance for the lager-empty fail-safe (separate from the one
+    # the pick station maintains internally; we reload from disk before each
+    # check so take_beam() decrements from inside a_pick_station are visible).
+    storage_check = None if dry_run else WoodStorage()
+
     for k in range(n_to_run):
         i = START_I + k
 
@@ -255,6 +328,17 @@ def main(*, dry_run=False):
         print(f"{'='*50}")
 
         if DO_PICK:
+            element = get_element(DATA, i, layer_idx=LAYER)
+            beam_size = element.get("beam_size", "").strip('"').strip("'")
+
+            # Fail-safe: if the lager for this category is empty, park robot
+            # and prompt operator to refill before attempting the pick.
+            if not dry_run:
+                storage_check.reload()
+                if not storage_check.has_beams(beam_size):
+                    remaining = _remaining_demand(DATA, LAYER, k, n_to_run, START_I, beam_size)
+                    refill_lager(r1, storage_check, beam_size, remaining)
+
             print("\n--- PICK ---")
             a_pick_station.a_pick_station(r1, DATA, i, layer_idx=LAYER, dry_run=dry_run, css_enabled=CSS_ENABLED, sim_beams=SIM_BEAMS)
 

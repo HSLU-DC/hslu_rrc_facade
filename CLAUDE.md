@@ -15,8 +15,9 @@ README.md                    # Student-facing overview
 design/
   hslu_rrc_facade.ghx        # GH template: export, validation, IK visualization
   hslu_rrc_facade.3dm        # Rhino file (not in git, too large)
-  simulation/
+  gh_python/
     ExportFacade.py          # GH component: writes fab_data JSON + 3 STLs per element
+    holzbedarf.py            # GH component: count elements per beam_size + total laufmeter
 
 docs/
   images/                    # Documentation images

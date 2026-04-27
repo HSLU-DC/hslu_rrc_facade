@@ -72,4 +72,4 @@ L{layer}_E{element}_cutB.stl   # After second cut (finished)
 All STLs are in grip-center-relative coordinates (origin = centerline midpoint),
 so the SmartComponent can attach them at the gripper TCP without further
 transforms. Produced by the `ExportFacade` Grasshopper component
-(`design/simulation/ExportFacade.py`) alongside the fab_data JSON.
+(`design/gh_python/ExportFacade.py`) alongside the fab_data JSON.

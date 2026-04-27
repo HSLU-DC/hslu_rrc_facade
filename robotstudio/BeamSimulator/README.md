@@ -82,5 +82,5 @@ L{layer}_E{element}_cutB.stl   # Finished beam (both cuts)
 
 All meshes are expressed in grip-center-relative coordinates (origin =
 centerline midpoint). The Grasshopper component
-`design/simulation/ExportFacade.py` produces them alongside the fab_data
+`design/gh_python/ExportFacade.py` produces them alongside the fab_data
 JSON.

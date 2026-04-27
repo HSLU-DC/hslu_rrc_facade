@@ -18,7 +18,7 @@ from globals import FRAME_WIDTH, FRAME_LENGTH, BEAM_SECTION, MAX_LAYERS
 
 # Valid beam size categories (length in mm). Must match VALID_CATEGORIES
 # in process/_skills/WoodStorage/wood_storage.py and STOCK_LENGTHS in
-# design/simulation/ExportFacade.py.
+# design/gh_python/ExportFacade.py.
 VALID_BEAM_SIZES = ("400", "550", "750", "1000")
 
 # Maximum beam lengths per category (mm). The category name IS the stock

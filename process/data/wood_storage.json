@@ -3,14 +3,14 @@
     "400_1": {
       "category": "400",
       "capacity": 23,
-      "count": 23,
+      "count": 0,
       "wobj": "ob_HSLU_Pick_400",
-      "extax": 0,
+      "extax": 250,
       "base_frame": {
         "point": [
-          0,
-          0,
-          0
+          200,
+          111.5,
+          -560.5
         ],
         "xaxis": [
           -1,
@@ -27,15 +27,15 @@
     },
     "550_1": {
       "category": "550",
-      "capacity": 23,
-      "count": 23,
+      "capacity": 14,
+      "count": 1,
       "wobj": "ob_HSLU_Pick_550",
-      "extax": 0,
+      "extax": 900,
       "base_frame": {
         "point": [
-          0,
-          0,
-          0
+          275,
+          290.5,
+          -560.5
         ],
         "xaxis": [
           -1,
@@ -53,14 +53,14 @@
     "750_1": {
       "category": "750",
       "capacity": 23,
-      "count": 23,
+      "count": 8,
       "wobj": "ob_HSLU_Pick_750",
-      "extax": 0,
+      "extax": 800,
       "base_frame": {
         "point": [
-          0,
-          0,
-          0
+          375,
+          469.5,
+          -560.5
         ],
         "xaxis": [
           -1,
@@ -78,14 +78,14 @@
     "1000_1": {
       "category": "1000",
       "capacity": 23,
-      "count": 23,
+      "count": 0,
       "wobj": "ob_HSLU_Pick_1000",
       "extax": 0,
       "base_frame": {
         "point": [
-          0,
-          0,
-          0
+          500,
+          648.5,
+          -560.5
         ],
         "xaxis": [
           -1,
@@ -101,5 +101,5 @@
       "stack_offset_z": 25
     }
   },
-  "last_updated": "2026-04-26T12:00:00.000000"
+  "last_updated": "2026-04-27T20:16:16.130250"
 }
