@@ -7,8 +7,9 @@ cell is closed before enabling the glue system.
 
 Each beam has 1-2 student-provided glue planes (glue_position_a, optional
 glue_position_b) on the top face where it will contact the beam above.
-The robot drives a predefined glue path pattern at each plane (forward
-pass + return pass with Y offset for a double bead).
+The robot drives a predefined glue path pattern at each plane: a zigzag
+fill of N parallel lines covering a 15x15 mm active area (5 mm margin
+on each side of the 25x25 mm beam top).
 
 Glue application is executed entirely in RAPID (r_RRC_CI_GlueLine) to
 avoid Python-ROS-RAPID latency — this ensures consistent glue bead quality.
@@ -24,6 +25,7 @@ if _parent not in sys.path:
     sys.path.insert(0, _parent)
 
 import compas_rrc as rrc
+from compas.geometry import Frame
 
 import _skills.custom_motion as cm
 from _skills.fabdata import load_data, get_element
@@ -79,56 +81,56 @@ def _build_offset_frames(start_frame):
     return pre, app, ret
 
 
-def _run_glue_line(r1, glue_frame, *, glue_valve_enabled=True, x_offset=-30,
-                   y_offset_return=10, do_return_pass=True,
-                   pulse_on_ms=20, pulse_off_ms=20, accel_dist=10):
-    """Execute a glue line with optional return pass.
+def _run_glue_line(r1, glue_frame, *, glue_valve_enabled=True,
+                   line_length=15, y_step=7.5, num_lines=3,
+                   pulse_on_ms=20, pulse_off_ms=20, accel_dist=0):
+    """Execute a zigzag fill of parallel glue lines around glue_frame.
 
-    Pattern:
-        1. Forward pass: Start -> End (x_offset direction, with glue)
-        2. Shift Y (y_offset_return)
-        3. Return pass: End+Y -> Start+Y (with glue)
+    Lines run along the frame's local X. The pattern is centered on glue_frame:
+      - Each line is ``line_length`` mm long, from -L/2 to +L/2 in X.
+      - ``num_lines`` parallel lines are spaced ``y_step`` mm apart, symmetric
+        about Y=0.
+      - Direction alternates each line (zigzag); shifts in Y between lines run
+        without glue.
+
+    Defaults give a 15x15 mm zigzag fill (3 lines at Y=-7.5/0/+7.5, each 15 mm)
+    on the 25x25 mm beam top, leaving a 5 mm margin on every side.
 
     Args:
-        glue_frame: Start frame for glue line
-        glue_valve_enabled: If True, opens/closes glue valve during path
-        x_offset: Offset in X direction (default: -30mm)
-        y_offset_return: Y shift for return pass (default: 10mm)
-        do_return_pass: If True, do a second glue line on return (default: True)
-        pulse_on_ms: Valve open time in ms (default: 20)
-        pulse_off_ms: Valve closed time in ms (default: 20)
-        accel_dist: Acceleration distance in mm (default: 10)
+        glue_frame: TCP frame at the centre of the active glue area (beam
+                    centred under the nozzle).
+        glue_valve_enabled: If True, pulses the glue valve during each line.
+        line_length: Length of each line along local X in mm.
+        y_step: Spacing between adjacent lines in mm.
+        num_lines: Number of parallel lines.
+        pulse_on_ms / pulse_off_ms / accel_dist: Pass-through to glue_line.
     """
-    end_frame = glue_frame.copy()
-    end_frame.point.x += x_offset
+    half_x = line_length / 2.0
+    y_offsets = [(i - (num_lines - 1) / 2.0) * y_step for i in range(num_lines)]
 
-    if glue_valve_enabled:
-        # Forward pass: glue from start to end
-        glue_line(r1, glue_frame, x_offset=x_offset, speed=SPEED_GLUE,
-                  pulse_on_ms=pulse_on_ms, pulse_off_ms=pulse_off_ms, accel_dist=accel_dist)
+    for idx, y_off in enumerate(y_offsets):
+        going_neg = (idx % 2 == 0)
+        x_offset = -line_length if going_neg else +line_length
+        x_start = +half_x if going_neg else -half_x
 
-        if do_return_pass:
-            # Shift Y (at end position) and run return pass
-            return_start = end_frame.copy()
-            return_start.point.y += y_offset_return
+        line_start = glue_frame.copy()
+        line_start.point.x += x_start
+        line_start.point.y += y_off
 
-            r1.send_and_wait(rrc.MoveToFrame(return_start, SPEED_GLUE, rrc.Zone.Z1, rrc.Motion.LINEAR))
+        # Position TCP at line start (no glue). FINE on the first line so the
+        # bead begins from rest; Z1 on subsequent shifts to keep it smooth.
+        zone_in = rrc.Zone.FINE if idx == 0 else rrc.Zone.Z1
+        speed_in = SPEED_APPROACH if idx == 0 else SPEED_GLUE
+        r1.send_and_wait(rrc.MoveToFrame(line_start, speed_in, zone_in, rrc.Motion.LINEAR))
 
-            glue_line(r1, return_start, x_offset=-x_offset, speed=SPEED_GLUE,
-                      pulse_on_ms=pulse_on_ms, pulse_off_ms=pulse_off_ms, accel_dist=accel_dist)
-    else:
-        # Dry move without glue (for position testing)
-        r1.send(rrc.MoveToFrame(glue_frame, SPEED_GLUE, rrc.Zone.Z10, rrc.Motion.LINEAR))
-        r1.send_and_wait(rrc.MoveToFrame(end_frame, SPEED_GLUE, rrc.Zone.FINE, rrc.Motion.LINEAR))
-
-        if do_return_pass:
-            return_start = end_frame.copy()
-            return_start.point.y += y_offset_return
-            return_end = glue_frame.copy()
-            return_end.point.y += y_offset_return
-
-            r1.send(rrc.MoveToFrame(return_start, SPEED_GLUE, rrc.Zone.Z1, rrc.Motion.LINEAR))
-            r1.send_and_wait(rrc.MoveToFrame(return_end, SPEED_GLUE, rrc.Zone.FINE, rrc.Motion.LINEAR))
+        if glue_valve_enabled:
+            glue_line(r1, line_start, x_offset=x_offset, speed=SPEED_GLUE,
+                      pulse_on_ms=pulse_on_ms, pulse_off_ms=pulse_off_ms,
+                      accel_dist=accel_dist)
+        else:
+            line_end = line_start.copy()
+            line_end.point.x += x_offset
+            r1.send_and_wait(rrc.MoveToFrame(line_end, SPEED_GLUE, rrc.Zone.FINE, rrc.Motion.LINEAR))
 
 
 # ==============================================================================
@@ -169,13 +171,18 @@ def _do_glue_sequence(r1, glue_frame, *, dry_run=False, tag="", glue_valve_enabl
     # sequence ends at jp_glue_rot, B's sequence reuses that state without
     # an extra coord move.
 
-    # Move to approach
+    # Reorient TCP at jp_glue_rot's position to glue_frame's orientation BEFORE
+    # translating. A combined rotate+translate move makes the held beam swing
+    # during the approach, which can collide with the glue station; rotating in
+    # place first means the subsequent move to `app` is pure translation.
+    current_tcp = r1.send_and_wait(rrc.GetFrame())
+    rot_oriented = Frame(current_tcp.point, glue_frame.xaxis, glue_frame.yaxis)
+    r1.send_and_wait(rrc.MoveToFrame(rot_oriented, SPEED_APPROACH, rrc.Zone.FINE, rrc.Motion.LINEAR))
+
+    # Move to approach (pure translation now — orientations match)
     r1.send_and_wait(cm.MoveToRobtarget(app, jp_glue.extax, 2, rrc.Zone.Z10, rrc.Motion.LINEAR))
 
-    # Move to start (fine)
-    r1.send_and_wait(rrc.MoveToFrame(glue_frame, SPEED_APPROACH, rrc.Zone.FINE, rrc.Motion.LINEAR))
-
-    # Execute glue line - all in RAPID (move + pulse + move back)
+    # Execute zigzag glue pattern (handles its own move-to-line-start)
     _run_glue_line(r1, glue_frame, glue_valve_enabled=glue_valve_enabled)
 
     # Retract + go back to pre position
