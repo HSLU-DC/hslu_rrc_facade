@@ -37,8 +37,8 @@ JOINT_LIMITS = {
 # Standard positions
 # ==============================================================================
 jp_calib = Jointtarget([0, 0, 0, 0, 0, 0], [0.0])           # Calibration (all zeros)
-jp_home = Jointtarget([90, 0, 0, 0, 90, 90], [1000.0])      # Home position
-jp_park = Jointtarget([180, -30, 75, 0, 45, 90], [0.0])     # Park (compact, track retracted)
+jp_home = Jointtarget([-40, 20, 0, 0, 70, -40], [500.0])    # Home / safe pose at process start and end
+jp_park = Jointtarget([-90, -30, 55, 0, -25, 90], [1500.0])     # Park (compact, track retracted)
 
 
 # ==============================================================================
