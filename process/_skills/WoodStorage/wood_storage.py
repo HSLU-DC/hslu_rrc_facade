@@ -303,7 +303,7 @@ class WoodStorage:
         for category in VALID_CATEGORIES:
             cat_status = status[category]
             print(f"\n{category} mm:")
-            print(f"  Available: {cat_status['available']} / {cat_status['total']}")
+            print(f"  Verfuegbar: {cat_status['available']} / {cat_status['total']}")
             for cid, cs in cat_status["compartments"].items():
                 bar = "#" * cs["count"] + "-" * (cs["capacity"] - cs["count"])
                 print(f"  {cid}: [{bar}] {cs['count']}/{cs['capacity']}")

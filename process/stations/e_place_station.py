@@ -25,9 +25,9 @@ Student input simplification:
     Students provide ONLY place_position in fab_data; the intermediate
     approach (app, rot) frames are computed automatically by
     create_intermediate_frames() to reduce student error potential.
-    The 150mm-above approach uses a fixed standard orientation
-    (create_approach_frame) so axis 6 doesn't spin on the way in from
-    the previous station.
+    The 150mm-above approach is a plain copy of place_frame (same
+    orientation, translated 150mm up in world Z) so the descent from
+    approach to place is a pure translation.
 
 Motion sequence (Layer 0 & 1, only layers in facade project):
     1. Joint move to approach config (POS/NEG dependent)
@@ -126,25 +126,17 @@ def get_jointset(name, sign):
     return list(js["robax"]), list(js["extax"])
 
 
-def create_approach_frame(place_frame, sign):
-    """Create an approach frame 150mm above place_frame with standard orientation.
+def create_approach_frame(place_frame):
+    """Create an approach frame 150mm above place_frame, same orientation.
 
-    Uses a standard orientation (no wrist rotation) to prevent J6 from
-    spinning on the way from the previous station to the approach frame.
+    Plain copy of the place frame translated 150mm up in world Z. The TCP
+    arrives already aligned with the final placement orientation, so the
+    subsequent linear approach (app -> rot -> place) is a pure translation
+    without any wrist re-orientation.
     """
-    point = place_frame.point.copy()
-    point.z += 150
-
-    if sign == "pos":
-        # X-axis points towards world +X, Z down
-        xaxis = Vector(1, 0, 0)
-        yaxis = Vector(0, -1, 0)
-    else:
-        # X-axis points towards world -X, Z down
-        xaxis = Vector(-1, 0, 0)
-        yaxis = Vector(0, 1, 0)
-
-    return Frame(point, xaxis, yaxis)
+    f = place_frame.copy()
+    f.point.z += 150
+    return f
 
 
 def create_intermediate_frames(place_frame, sign, offset):
@@ -214,8 +206,8 @@ def e_place_station(r1, data, i, *, layer_idx=0, dry_run=False, sim_beams=False)
     # Compute intermediate frames from place_position
     app_frame, rot_frame = create_intermediate_frames(place_frame, sign, offset)
 
-    # Approach frame: 150mm above place with standard orientation
-    approach_above_place = create_approach_frame(place_frame, sign)
+    # Approach frame: 150mm above place, same orientation as place_frame
+    approach_above_place = create_approach_frame(place_frame)
 
     if dry_run:
         print(f"[PLACE] i={i} layer={layer_idx}")
