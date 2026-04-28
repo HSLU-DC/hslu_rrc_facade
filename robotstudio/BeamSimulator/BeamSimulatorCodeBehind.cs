@@ -2,13 +2,17 @@
 // SmartComponent code-behind for dynamic beam geometry visualization.
 //
 // Lifecycle per element:
-//   Activate -> raw STL loaded, attached to gripper flange
-//   SwapCutA -> raw replaced with cut-A STL
-//   SwapCutB -> cut-A replaced with finished STL
-//   Release  -> beam detached from gripper, stays at world position
-//   Reset    -> all placed beams deleted, state cleared
+//   Activate -> raw STL loaded, parented under HeldGroup, attached to gripper flange
+//   SwapCutA -> raw replaced with cut-A STL (still under HeldGroup)
+//   SwapCutB -> cut-A replaced with finished STL (still under HeldGroup)
+//   Release  -> beam detached from gripper, re-parented from HeldGroup to PlacedGroup
+//   Reset    -> all parts in HeldGroup + PlacedGroup deleted, state cleared
 //
-// Placed beams accumulate in the station, building up the facade.
+// HeldGroup and PlacedGroup are child SmartComponents inside BeamSimulator,
+// created on first use. They give Collision Sets two stable container references:
+//   ObjektA: robot + gripper + BeamSimulator/HeldGroup
+//   ObjektB: static fixtures + BeamSimulator/PlacedGroup
+// Released beams automatically migrate from ObjektA to ObjektB.
 
 using System;
 using System.Collections.Generic;
@@ -35,6 +39,12 @@ namespace BeamSimulator
         private const string KEY_CACHE_RESTORED = "GeometryFolderCacheRestored";
         private const string KEY_RUNTIME_FOLDER = "RuntimeGeometryFolder";
         private const string KEY_RUNTIME_TOOL = "RuntimeToolName";
+        private const string KEY_HELD_GROUP = "HeldGroupRef";
+        private const string KEY_PLACED_GROUP = "PlacedGroupRef";
+
+        // Container child SC names. Looked up by name so they survive station reload.
+        private const string HELD_GROUP_NAME = "HeldGroup";
+        private const string PLACED_GROUP_NAME = "PlacedGroup";
 
         // RAPID PERS variable names populated by r_HSLU_SimBeamReset.
         // If set and non-empty, they override the SC's Property values.
@@ -60,6 +70,7 @@ namespace BeamSimulator
             base.OnInitialize(component);
             InitializeStateCache(component);
             TryRestoreGeometryFolder(component);
+            EnsureGroups(component);
         }
 
         public override void OnSimulationStart(SmartComponent component)
@@ -204,7 +215,7 @@ namespace BeamSimulator
                     $"BeamSimulator: Loading {filePath} (exists={File.Exists(filePath)})"));
 
                 // Load and attach
-                Part part = LoadStl(filePath);
+                Part part = LoadStl(component, filePath);
                 if (part != null)
                 {
                     Logger.AddMessage(new LogMessage(
@@ -251,7 +262,7 @@ namespace BeamSimulator
             if (oldPart != null)
             {
                 try { mech?.GetFlange(0).Detach(oldPart); } catch { }
-                try { Station.ActiveStation?.GraphicComponents.Remove(oldPart); } catch { }
+                RemoveFromAnyParent(component, oldPart);
                 try { oldPart.Delete(); } catch { }
                 component.StateCache[KEY_CURRENT_PART] = null;
                 Logger.AddMessage(new LogMessage("BeamSimulator: Old part removed"));
@@ -264,7 +275,7 @@ namespace BeamSimulator
             string fileName = $"L{layerId}_E{elementId}_{stage}.stl";
             string filePath = Path.Combine(folder, fileName);
 
-            Part newPart = LoadStl(filePath);
+            Part newPart = LoadStl(component, filePath);
             if (newPart != null && mech != null)
             {
                 Matrix4 tcpOffset = GetToolOffset(component);
@@ -301,7 +312,12 @@ namespace BeamSimulator
                 // Detach from flange
                 try { mech.GetFlange(0).Detach(currentPart); } catch { }
 
-                // Restore world position (Detach may reset it)
+                // Re-parent: HeldGroup -> PlacedGroup. Migrating the part across
+                // SC containers is what makes Collision Sets auto-update — held
+                // beam was in ObjektA, placed beam becomes obstacle in ObjektB.
+                ReparentToPlaced(component, currentPart);
+
+                // Restore world position (Detach + Re-parent may have moved it)
                 try { currentPart.Transform.GlobalMatrix = worldPosition; } catch { }
 
                 // Track as placed beam
@@ -341,11 +357,11 @@ namespace BeamSimulator
                 Mechanism mech = FindMechanism(component);
                 if (currentPart != null)
                 {
-                    DetachAndDelete(mech, currentPart);
+                    DetachAndDelete(component, mech, currentPart);
                     Logger.AddMessage(new LogMessage("BeamSimulator: Deleted current part"));
                 }
 
-                // Delete all placed beams
+                // Delete all placed beams (clear PlacedGroup children + tracked list)
                 var placedBeams = component.StateCache[KEY_PLACED_BEAMS] as List<Part>;
                 int count = 0;
                 if (placedBeams != null)
@@ -355,13 +371,28 @@ namespace BeamSimulator
                     {
                         try
                         {
-                            Station station = Station.ActiveStation;
-                            station?.GraphicComponents.Remove(placedBeams[i]);
+                            RemoveFromAnyParent(component, placedBeams[i]);
                             placedBeams[i].Delete();
                         }
                         catch { }
                     }
                     placedBeams.Clear();
+                }
+
+                // Belt-and-suspenders: also clear any orphaned children inside
+                // PlacedGroup that aren't tracked in placedBeams (e.g. survivors
+                // from a previous session loaded from .rsstn).
+                SmartComponent placedGroup = GetPlacedGroup(component);
+                if (placedGroup != null)
+                {
+                    var leftovers = new List<GraphicComponent>();
+                    foreach (GraphicComponent gc in placedGroup.GraphicComponents)
+                        leftovers.Add(gc);
+                    foreach (var gc in leftovers)
+                    {
+                        try { placedGroup.GraphicComponents.Remove(gc); } catch { }
+                        try { (gc as Part)?.Delete(); } catch { }
+                    }
                 }
 
                 // Reset state
@@ -390,9 +421,11 @@ namespace BeamSimulator
         // ============================================================
 
         /// <summary>
-        /// Load an STL file as a Part in the station.
+        /// Load an STL file as a Part and parent it under HeldGroup (or, if the
+        /// container can't be created, fall back to the BeamSimulator SC itself,
+        /// or to the station root as last resort).
         /// </summary>
-        private Part LoadStl(string filePath)
+        private Part LoadStl(SmartComponent component, string filePath)
         {
             if (!File.Exists(filePath))
             {
@@ -406,8 +439,7 @@ namespace BeamSimulator
                 if (part != null)
                 {
                     part.Name = Path.GetFileNameWithoutExtension(filePath);
-                    Station station = Station.ActiveStation;
-                    station?.GraphicComponents.Add(part);
+                    AddToHeldContainer(component, part);
                     ApplyWoodColor(part);
                 }
                 return part;
@@ -417,6 +449,24 @@ namespace BeamSimulator
                 LogWarning($"Failed to load STL: {ex.Message}");
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Add a Part to the HeldGroup container. Falls back to the BeamSimulator
+        /// SC itself if HeldGroup can't be created, then to the station root.
+        /// </summary>
+        private void AddToHeldContainer(SmartComponent component, Part part)
+        {
+            SmartComponent heldGroup = GetHeldGroup(component);
+            if (heldGroup != null)
+            {
+                try { heldGroup.GraphicComponents.Add(part); return; }
+                catch (Exception ex) { LogWarning($"AddToHeld (group): {ex.Message}"); }
+            }
+            try { component.GraphicComponents.Add(part); return; }
+            catch (Exception ex) { LogWarning($"AddToHeld (parent): {ex.Message}"); }
+            try { Station.ActiveStation?.GraphicComponents.Add(part); }
+            catch (Exception ex) { LogWarning($"AddToHeld (station): {ex.Message}"); }
         }
 
         /// <summary>
@@ -606,13 +656,124 @@ namespace BeamSimulator
         }
 
         /// <summary>
-        /// Detach a part from mechanism and delete it.
+        /// Detach a part from mechanism and delete it. Removes the part from
+        /// whatever container it's currently parented under (HeldGroup, parent
+        /// SC, or station root) before deleting.
         /// </summary>
-        private void DetachAndDelete(Mechanism mech, Part part)
+        private void DetachAndDelete(SmartComponent component, Mechanism mech, Part part)
         {
             try { mech?.GetFlange(0).Detach(part); } catch { }
-            try { Station.ActiveStation?.GraphicComponents.Remove(part); } catch { }
+            RemoveFromAnyParent(component, part);
             try { part.Delete(); } catch { }
+        }
+
+        /// <summary>
+        /// Remove a part from whichever container holds it. Tries HeldGroup,
+        /// PlacedGroup, BeamSimulator SC, and station root in that order. The
+        /// SDK doesn't expose a "current parent" lookup, so we just attempt
+        /// removal from each plausible container and swallow failures.
+        /// </summary>
+        private void RemoveFromAnyParent(SmartComponent component, Part part)
+        {
+            SmartComponent heldGroup = GetHeldGroup(component);
+            SmartComponent placedGroup = GetPlacedGroup(component);
+            try { heldGroup?.GraphicComponents.Remove(part); } catch { }
+            try { placedGroup?.GraphicComponents.Remove(part); } catch { }
+            try { component.GraphicComponents.Remove(part); } catch { }
+            try { Station.ActiveStation?.GraphicComponents.Remove(part); } catch { }
+        }
+
+        /// <summary>
+        /// Move a Part from HeldGroup to PlacedGroup. Used on Release so the
+        /// beam migrates from "actively held" (ObjektA in collision sets) to
+        /// "static obstacle" (ObjektB) in one operation.
+        /// </summary>
+        private void ReparentToPlaced(SmartComponent component, Part part)
+        {
+            RemoveFromAnyParent(component, part);
+            SmartComponent placedGroup = GetPlacedGroup(component);
+            if (placedGroup != null)
+            {
+                try { placedGroup.GraphicComponents.Add(part); return; }
+                catch (Exception ex) { LogWarning($"ReparentToPlaced (group): {ex.Message}"); }
+            }
+            // Fallbacks if PlacedGroup can't be created
+            try { component.GraphicComponents.Add(part); return; }
+            catch (Exception ex) { LogWarning($"ReparentToPlaced (parent): {ex.Message}"); }
+            try { Station.ActiveStation?.GraphicComponents.Add(part); }
+            catch (Exception ex) { LogWarning($"ReparentToPlaced (station): {ex.Message}"); }
+        }
+
+        // ============================================================
+        // Container groups: HeldGroup + PlacedGroup as nested SmartComponents
+        // ============================================================
+
+        /// <summary>
+        /// Make sure both container child SCs exist. Called on init and lazily
+        /// from getters so the groups appear in the browser as soon as the
+        /// BeamSimulator is instantiated.
+        /// </summary>
+        private void EnsureGroups(SmartComponent component)
+        {
+            GetHeldGroup(component);
+            GetPlacedGroup(component);
+        }
+
+        private SmartComponent GetHeldGroup(SmartComponent component)
+        {
+            return GetOrFindGroup(component, KEY_HELD_GROUP, HELD_GROUP_NAME);
+        }
+
+        private SmartComponent GetPlacedGroup(SmartComponent component)
+        {
+            return GetOrFindGroup(component, KEY_PLACED_GROUP, PLACED_GROUP_NAME);
+        }
+
+        private SmartComponent GetOrFindGroup(SmartComponent component,
+                                              string cacheKey, string groupName)
+        {
+            // Cached reference — fastest path
+            if (component.StateCache.ContainsKey(cacheKey))
+            {
+                if (component.StateCache[cacheKey] is SmartComponent cached)
+                {
+                    // Sanity-check: ensure the cached SC is still attached to the parent.
+                    // (User could have deleted it manually.)
+                    foreach (GraphicComponent gc in component.GraphicComponents)
+                    {
+                        if (ReferenceEquals(gc, cached))
+                            return cached;
+                    }
+                    component.StateCache.Remove(cacheKey);
+                }
+            }
+
+            // Look up by name (handles station-reload case where SC tree is
+            // restored from .rsstn but StateCache is empty)
+            foreach (GraphicComponent gc in component.GraphicComponents)
+            {
+                if (gc is SmartComponent sc && sc.Name == groupName)
+                {
+                    component.StateCache[cacheKey] = sc;
+                    return sc;
+                }
+            }
+
+            // Create new
+            try
+            {
+                var newSc = new SmartComponent { Name = groupName };
+                component.GraphicComponents.Add(newSc);
+                component.StateCache[cacheKey] = newSc;
+                Logger.AddMessage(new LogMessage(
+                    $"BeamSimulator: Created child SC '{groupName}'"));
+                return newSc;
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"GetOrFindGroup('{groupName}'): {ex.Message}");
+                return null;
+            }
         }
 
         /// <summary>

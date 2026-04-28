@@ -7,15 +7,31 @@ during facade production simulation.
 
 Loads STL geometry files on-demand and manages the beam lifecycle:
 
-1. **Activate** – Load raw beam STL, attach to gripper flange
-2. **SwapCutA** – Replace with after-cut-A geometry
-3. **SwapCutB** – Replace with finished beam geometry
-4. **Release** – Detach from gripper (beam stays at place position)
-5. **Reset** – Delete all placed beams
+1. **Activate** – Load raw beam STL, parent it under `HeldGroup`, attach to gripper flange
+2. **SwapCutA** – Replace with after-cut-A geometry (still under `HeldGroup`)
+3. **SwapCutB** – Replace with finished beam geometry (still under `HeldGroup`)
+4. **Release** – Detach from gripper, re-parent from `HeldGroup` to `PlacedGroup`
+5. **Reset** – Delete every part in both groups
 
 Placed beams accumulate, visually building up the facade. Each loaded beam
 is coloured in a light wood tone (RGB 180/130/80) so elements stand out
 against the station background.
+
+## Container layout
+
+`BeamSimulator` exposes two child SmartComponents that act as collision-set
+containers:
+
+```
+BeamSimulator
+├── HeldGroup     ← currently gripped beam (0 or 1 part)
+└── PlacedGroup   ← all released beams (grows over the run)
+```
+
+The groups are baked into the `.rslib` at build time and re-discovered (or
+re-created) on station load by name. Released beams migrate atomically from
+`HeldGroup` to `PlacedGroup`, which is how Collision Sets pick up obstacle
+state without manual edits.
 
 ## Build
 
@@ -69,6 +85,24 @@ SmartComponent signal names are identical to the RAPID side – wire 1:1:
 |---|---|---|
 | `GeometryFolder` | (empty) | Folder containing the `L{layer}_E{element}_{raw\|cutA\|cutB}.stl` files. Auto-restored from `%APPDATA%\HSLU_BeamSimulator\station_paths.txt` on station open. |
 | `ToolName` | `t_HSLU_GripperZimmer` | Name of the `tooldata` whose `Frame.Matrix` is used as TCP offset when attaching a beam to the flange. STLs are exported in grip-center coordinates; this offset moves the beam from TCP space to flange space. |
+
+## Collision Sets
+
+The container layout makes a single set sufficient for run-time collision
+checks against static fixtures and accumulating placed beams:
+
+| Group | Members |
+|---|---|
+| `ObjektA` | Robot mechanism (`<CRB15000_*>`), gripper tool (`<gripper>`), `BeamSimulator/HeldGroup` |
+| `ObjektB` | Einhausung parts, station fixtures (cut/glue/place), `BeamSimulator/PlacedGroup` |
+
+Optional: enable `Near miss` (5–10 mm) for early warnings, and turn on
+`Stop simulation when collision is detected` in Simulation → Configuration
+to halt the run on first contact.
+
+When a beam is `Released`, it moves from `HeldGroup` to `PlacedGroup` —
+that is, from `ObjektA` to `ObjektB` — so the next pick automatically
+treats it as an obstacle without any manual collision-set edits.
 
 ## STL File Convention
 
