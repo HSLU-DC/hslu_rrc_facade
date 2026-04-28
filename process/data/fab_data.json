@@ -23,7 +23,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ec1955da-c18e-40ad-b6e8-0f974de3c9dc"
+                        "guid": "a9b056af-76f6-46aa-8041-59d110f783c0"
                     },
                     "cut_position_b": {
                         "data": {
@@ -44,7 +44,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "621b0eab-a82d-4283-997f-b3b7ab3cc68e"
+                        "guid": "7d85211d-063d-4803-af15-81b170a2b3b6"
                     },
                     "glue_position_a": {
                         "data": {
@@ -65,7 +65,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "92673d3a-9f2f-41e2-846a-20d1206ed5ce"
+                        "guid": "777dabd9-7943-4f16-882f-425a0bf0fceb"
                     },
                     "glue_position_b": {
                         "data": {
@@ -86,7 +86,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "37313c9a-49ac-4316-9b0a-24e38a9cb928"
+                        "guid": "8764da46-a5b7-417e-bb77-3e65cb4daedd"
                     },
                     "id": 0,
                     "place_position": {
@@ -108,7 +108,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "3ad8a4ae-d330-488a-953a-72725247f319"
+                        "guid": "2f3314dc-2165-4b6e-b633-0a0ccd3c14e5"
                     }
                 },
                 {
@@ -132,7 +132,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "657da4ba-72ef-4800-b521-9cc55a58d7e7"
+                        "guid": "57c3da5d-46ff-4cea-8e54-f767d64e8aa1"
                     },
                     "cut_position_b": {
                         "data": {
@@ -153,7 +153,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "4733e269-1ac8-479c-bf78-9fe6a0f22fb0"
+                        "guid": "710f70ad-d27b-4b42-80c9-d2d48ffc6757"
                     },
                     "glue_position_a": {
                         "data": {
@@ -174,7 +174,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "db9f52db-5db3-4c83-af08-9e0a2ff35b90"
+                        "guid": "98042edb-34c3-48cb-ba54-c510c20847e6"
                     },
                     "glue_position_b": {
                         "data": {
@@ -195,7 +195,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "11675ecb-4c22-4c53-b1c3-bbfdf86eb70b"
+                        "guid": "c7c332c5-c4a8-430a-8d3e-e3560fdd4e85"
                     },
                     "id": 1,
                     "place_position": {
@@ -217,7 +217,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "5b5b5643-8560-4b93-8837-14e0bf2db20a"
+                        "guid": "499e6cc4-83ae-4dde-8ed6-97b45ee3d0bd"
                     }
                 },
                 {
@@ -241,7 +241,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "7ddb1268-71ca-495f-927b-636226590f31"
+                        "guid": "214abff3-6dec-422e-876f-281a5dcb9069"
                     },
                     "cut_position_b": {
                         "data": {
@@ -262,7 +262,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "6a7a4829-b9ba-4a33-a510-ed32c36fed1d"
+                        "guid": "4365b9de-b5b6-4fad-99e6-4cfc8ea4fe54"
                     },
                     "glue_position_a": {
                         "data": {
@@ -283,7 +283,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "dfe74b80-3bc1-4242-9957-a4e9ddd8b2f3"
+                        "guid": "380ae4e0-e0d8-40c8-9df0-8386feb44de1"
                     },
                     "glue_position_b": {
                         "data": {
@@ -304,7 +304,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "d4ba1ff9-58cd-4562-ac95-6c5b3e245909"
+                        "guid": "870335d4-5cbc-43ce-a36f-c5732955a969"
                     },
                     "id": 2,
                     "place_position": {
@@ -326,7 +326,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "24d72522-49cb-4ebc-bfd3-40564d2e1593"
+                        "guid": "7f368f12-c458-4171-a0c4-1e56c0eb1504"
                     }
                 },
                 {
@@ -350,7 +350,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ffa80813-39d2-4949-b43e-21e9acb6bb01"
+                        "guid": "e2480ba8-eeec-4631-910f-37780b770bee"
                     },
                     "cut_position_b": {
                         "data": {
@@ -371,7 +371,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "484850a9-1dae-49cf-adf5-25088c76243b"
+                        "guid": "73f9640a-8ccd-479f-958e-52623542be4f"
                     },
                     "glue_position_a": {
                         "data": {
@@ -392,7 +392,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "e2bdbf05-756a-4762-8d4e-d617ae5d2d24"
+                        "guid": "e4b76872-9abe-4021-9074-f7606e5ba08d"
                     },
                     "glue_position_b": {
                         "data": {
@@ -413,7 +413,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "a04d8845-9ad4-456a-be39-5655c28f453c"
+                        "guid": "985b10a7-0e34-4ede-b9e2-a7ce92907f57"
                     },
                     "id": 3,
                     "place_position": {
@@ -435,7 +435,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "0998d11f-6665-4693-8703-6abab5ca6aa3"
+                        "guid": "8a60a0bb-b167-4581-bcbd-70a145cfc10e"
                     }
                 },
                 {
@@ -459,7 +459,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ce2c3a18-ee85-436e-a613-bed3fdd3e343"
+                        "guid": "eb4e59ab-942b-4680-8b95-1a99136c7c9b"
                     },
                     "cut_position_b": {
                         "data": {
@@ -480,7 +480,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "3ec7444a-7e82-4f6c-9cc5-ed2211e50967"
+                        "guid": "a70e9c91-3d47-4486-bdb0-a312c66219b8"
                     },
                     "glue_position_a": {
                         "data": {
@@ -501,7 +501,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "7d3d4cc5-9d81-451b-b21d-705000a1c61e"
+                        "guid": "da82951d-1e99-4676-a9a6-b00c6d803a38"
                     },
                     "glue_position_b": {
                         "data": {
@@ -522,7 +522,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "2894b056-fe7c-4a39-8a38-003668de8492"
+                        "guid": "92f60d33-d7db-451d-9c93-b7a7138f4b7a"
                     },
                     "id": 4,
                     "place_position": {
@@ -544,7 +544,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "e7eda856-e844-464f-a9f0-9e1994c78ab9"
+                        "guid": "d00007dc-7a87-4498-bc05-6b767b6eb517"
                     }
                 },
                 {
@@ -568,7 +568,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "60dcab0f-b533-4a1b-b32f-5ccd04b1ef72"
+                        "guid": "86b2d9eb-b242-482a-9ba3-90345e076680"
                     },
                     "cut_position_b": {
                         "data": {
@@ -589,7 +589,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "6ce8486e-5a77-42d7-8949-5352156d1ae3"
+                        "guid": "b2f9d4e9-2e75-4726-aa66-217c346bcfe6"
                     },
                     "glue_position_a": {
                         "data": {
@@ -610,7 +610,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "75097447-3d31-468d-9b29-babc1e30d9f1"
+                        "guid": "8b831ab2-c2d3-466d-8d85-e4187ddee887"
                     },
                     "glue_position_b": {
                         "data": {
@@ -631,7 +631,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "462f85a5-38d5-4cd7-84b0-b137f32937b1"
+                        "guid": "4b4b43fc-1616-497b-9923-c324167f8b7e"
                     },
                     "id": 5,
                     "place_position": {
@@ -653,7 +653,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "a07fc9c3-9b48-4d11-9509-3e470c039f45"
+                        "guid": "1335ef79-3060-4de7-a02f-654f54205b8b"
                     }
                 },
                 {
@@ -677,7 +677,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "b4f19ac3-6711-4622-bb1f-19e9d1113e77"
+                        "guid": "02a2edcb-45c3-4a13-aff4-d824543182ee"
                     },
                     "cut_position_b": {
                         "data": {
@@ -698,7 +698,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "723d8196-38a7-442a-b0a9-c5e14c4787d2"
+                        "guid": "40cacef5-9604-417b-88ce-125a73a755b8"
                     },
                     "glue_position_a": {
                         "data": {
@@ -719,7 +719,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "32caecf4-4b05-452f-b32b-3eb1a5db77a1"
+                        "guid": "2b60f6b4-3f68-45b0-a7d3-41382c8d3da6"
                     },
                     "glue_position_b": {
                         "data": {
@@ -740,7 +740,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "04ff2222-489a-4380-a580-902292f9e702"
+                        "guid": "2e5040ae-de4e-458c-8af4-0d551f43b9f9"
                     },
                     "id": 6,
                     "place_position": {
@@ -762,7 +762,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "1496719f-9cdc-4683-abd7-e8f587c4c3f1"
+                        "guid": "976b1ae0-ad4a-4ab9-95c1-4850419eb373"
                     }
                 },
                 {
@@ -786,7 +786,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "5fbac1e0-7d11-4871-ad5b-56ecf42a1940"
+                        "guid": "cabcfffd-7325-490a-8e61-d46e1912c7e3"
                     },
                     "cut_position_b": {
                         "data": {
@@ -807,7 +807,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "b907eaed-10b7-48ac-9cbb-fbf3d181ae43"
+                        "guid": "ef38cc43-5182-4fd9-b64f-59438f6108f5"
                     },
                     "glue_position_a": {
                         "data": {
@@ -828,7 +828,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "70131a12-0e6a-4b40-9aae-a95ae57ce7a9"
+                        "guid": "222cc91b-a6af-4183-9840-14718745c40d"
                     },
                     "glue_position_b": {
                         "data": {
@@ -849,7 +849,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "6246af85-f98e-472b-8b30-7eab3de198eb"
+                        "guid": "ba4be6be-8012-4559-9cce-9ebe6a45f34a"
                     },
                     "id": 7,
                     "place_position": {
@@ -871,7 +871,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "39c2a252-ae27-426e-b519-61bbff6c20e9"
+                        "guid": "0094ac4d-f8dd-4e9a-bb63-03d5408ef68f"
                     }
                 },
                 {
@@ -895,7 +895,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "f5892d48-e465-4066-92dd-90d4e038f2c5"
+                        "guid": "018c7084-0c30-4c22-a9fd-236feea16cba"
                     },
                     "cut_position_b": {
                         "data": {
@@ -916,7 +916,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "bb62e99b-1dd2-46f6-a71f-f177a8acc650"
+                        "guid": "95bff66b-6295-466b-b3cb-48719029a89d"
                     },
                     "glue_position_a": {
                         "data": {
@@ -937,7 +937,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "a417cc9c-c3ee-45a2-83cb-e4d60cd6d348"
+                        "guid": "2a407bd3-e9c0-4c30-afe7-3008aa583ced"
                     },
                     "glue_position_b": {
                         "data": {
@@ -958,7 +958,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "9138fdfa-ad5c-4e0e-97fe-62db02d9eb33"
+                        "guid": "9a0d27b5-f986-4ba4-8c8c-ccab71d57b02"
                     },
                     "id": 8,
                     "place_position": {
@@ -980,7 +980,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "5bd38970-e338-4564-a60a-5376856b35ca"
+                        "guid": "a10629cd-6f1c-4008-a3b0-18250b50ae08"
                     }
                 },
                 {
@@ -1004,7 +1004,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "157869d4-4939-49a0-bbca-91a4de7d5eee"
+                        "guid": "cafb3567-237f-4b9b-96eb-b3e17eeefdc7"
                     },
                     "cut_position_b": {
                         "data": {
@@ -1025,7 +1025,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "e059ccfc-f4f1-4844-8f59-76a077349806"
+                        "guid": "906329b5-ef8e-455a-94b2-58279832f199"
                     },
                     "glue_position_a": {
                         "data": {
@@ -1046,7 +1046,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "047be2fe-3fa8-4e01-a1b3-60430a0f8f0c"
+                        "guid": "428b2c68-7b0a-4af3-8ae0-819908b19e0b"
                     },
                     "glue_position_b": {
                         "data": {
@@ -1067,7 +1067,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "249211b0-3640-4502-a128-06f806d148c9"
+                        "guid": "2715ee54-bf02-47be-8edb-962dbfd5f039"
                     },
                     "id": 9,
                     "place_position": {
@@ -1089,7 +1089,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "c86d4932-4bb4-4ada-99d9-3aaa5a17f275"
+                        "guid": "bf330ad4-cd6d-4025-a4e8-6294cf6c1f4c"
                     }
                 },
                 {
@@ -1113,7 +1113,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "59165e10-9118-4286-b2c2-c9335ed7967d"
+                        "guid": "5074791b-3689-448f-a2d5-06b7f16b9f4e"
                     },
                     "cut_position_b": {
                         "data": {
@@ -1134,7 +1134,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "102f3c2b-8570-4c76-a7dd-3461433e89c4"
+                        "guid": "c2fc4094-5530-4338-a9aa-93144dbbba17"
                     },
                     "glue_position_a": {
                         "data": {
@@ -1155,7 +1155,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "39f4dc92-1ebd-4bd0-b9c1-be262ee7863d"
+                        "guid": "78047e86-f2a7-4e7b-8bd9-0592f9745b6d"
                     },
                     "glue_position_b": {
                         "data": {
@@ -1176,7 +1176,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "d696fb2b-2a48-4533-bf7d-d2229fb62f43"
+                        "guid": "cefd0cf6-ccfc-49f4-9097-caef7cc2f224"
                     },
                     "id": 10,
                     "place_position": {
@@ -1198,7 +1198,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "6b0bb39f-2d2a-48b4-b8b7-87068568c838"
+                        "guid": "6fb52559-c59e-4b2c-be27-e2e781150c96"
                     }
                 },
                 {
@@ -1222,7 +1222,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "19830d25-9854-4cbc-b98c-255c478988c6"
+                        "guid": "17a389f5-2832-4a93-a7d7-60ac23afc000"
                     },
                     "cut_position_b": {
                         "data": {
@@ -1243,7 +1243,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "2c5ca28e-fe04-4387-ac42-f8dd940f9d2d"
+                        "guid": "b4652071-3a04-4720-a90a-992b35ce7f30"
                     },
                     "glue_position_a": {
                         "data": {
@@ -1264,7 +1264,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "de6c96d5-24b2-4059-a594-a64e844acea0"
+                        "guid": "9f5faa65-02e8-434a-8bc8-7faedb06d90f"
                     },
                     "glue_position_b": {
                         "data": {
@@ -1285,7 +1285,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "b4697ffe-da3e-4249-a8a3-a4c551f07131"
+                        "guid": "3da4664f-ec1b-42e2-b841-da9e2a00f947"
                     },
                     "id": 11,
                     "place_position": {
@@ -1307,7 +1307,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "16af9ca5-8cca-400c-9130-b6fdf99f1276"
+                        "guid": "9d5f1f3a-245c-4a72-a79d-71e645d9e77b"
                     }
                 },
                 {
@@ -1331,7 +1331,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "60905098-998f-40a4-9fd6-72adad26744d"
+                        "guid": "ad478b2b-913f-45e1-a218-673f7bc94c6b"
                     },
                     "cut_position_b": {
                         "data": {
@@ -1352,7 +1352,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "256a7af0-d461-42b2-ab14-ec2efddf628a"
+                        "guid": "64990096-be28-4bce-bf0a-96e47ebee02c"
                     },
                     "glue_position_a": {
                         "data": {
@@ -1373,7 +1373,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "019e2259-d4da-4e61-9e8d-072698407088"
+                        "guid": "348cf2ed-1e17-4fe3-a9df-016d97c725dd"
                     },
                     "glue_position_b": {
                         "data": {
@@ -1394,7 +1394,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "4c8fb39c-f403-4cfa-a690-7d0242b867bc"
+                        "guid": "6869cbe6-3e93-49df-adf8-361ef67f3448"
                     },
                     "id": 12,
                     "place_position": {
@@ -1416,7 +1416,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "d8f25ff2-8c22-459f-ba97-c5973c8b6280"
+                        "guid": "ad399152-658e-45b4-b716-2089f8c7b1dd"
                     }
                 },
                 {
@@ -1440,7 +1440,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "f0f5e892-d277-4bb2-bf3d-ffd5ac1d3714"
+                        "guid": "cbcfd6e6-a635-4bc7-b12e-5c2d1b3ad429"
                     },
                     "cut_position_b": {
                         "data": {
@@ -1461,7 +1461,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "7c3f08f4-8516-4ec1-ad58-db23cac3cbf4"
+                        "guid": "68491ec2-5239-4bf4-a383-7231c936328d"
                     },
                     "glue_position_a": {
                         "data": {
@@ -1482,7 +1482,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "f4d882b7-a431-43ad-9e43-062c15771f58"
+                        "guid": "fa81398f-6d0e-40bc-b8fe-58ea455c8790"
                     },
                     "glue_position_b": {
                         "data": {
@@ -1503,7 +1503,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "cdc1e959-0b01-4788-884f-21ef25a0130f"
+                        "guid": "7336b9ea-3ac0-4740-8dca-1d9a86b5338a"
                     },
                     "id": 13,
                     "place_position": {
@@ -1525,7 +1525,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "9870836a-78b0-4fe6-b76f-b7668b3d0af7"
+                        "guid": "0f4a6421-3f73-43d5-95a0-3d039b348390"
                     }
                 },
                 {
@@ -1549,7 +1549,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "4da5c116-05e1-43e6-838b-d7a57cf0f40a"
+                        "guid": "dbc1870b-40db-4486-81c0-612cc7f58fcb"
                     },
                     "cut_position_b": {
                         "data": {
@@ -1570,7 +1570,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "16a531ae-799e-48ca-81bc-1a2feb3e7d8b"
+                        "guid": "c91dbd13-abc2-492a-8798-b32d031d455b"
                     },
                     "glue_position_a": {
                         "data": {
@@ -1591,7 +1591,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "c2fd140c-addf-4b3a-a8da-8142425d9994"
+                        "guid": "a07c363b-b998-4db7-bd2c-dcf2b5980e71"
                     },
                     "glue_position_b": {
                         "data": {
@@ -1612,7 +1612,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "62146085-e35b-4cde-887d-6ca181ee3a53"
+                        "guid": "7a6c10ff-789d-4e03-a4e0-317a50ee1410"
                     },
                     "id": 14,
                     "place_position": {
@@ -1634,7 +1634,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "17f307a1-7c4e-4d8f-9d87-f535417814c3"
+                        "guid": "3933c4fa-d9f9-43b4-abb6-bf512ab597c3"
                     }
                 },
                 {
@@ -1658,7 +1658,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "baa4a52d-9263-479e-bde8-483541e866a7"
+                        "guid": "dc506676-490a-426e-9dea-1f67d062df66"
                     },
                     "cut_position_b": {
                         "data": {
@@ -1679,7 +1679,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "8952339a-1139-4b74-8e98-b305b3ddc452"
+                        "guid": "28a6866a-d2b9-4f64-856d-43bee9b3ead5"
                     },
                     "glue_position_a": {
                         "data": {
@@ -1700,7 +1700,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "845f47d3-686a-49f5-b3e4-7c914aa1c208"
+                        "guid": "7daf2b2a-df72-4a5f-a205-882d98bf27e8"
                     },
                     "glue_position_b": {
                         "data": {
@@ -1721,7 +1721,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "bc1487a7-a7bd-41e1-8f60-1e9e4f9bb406"
+                        "guid": "a45825d9-9280-4fa8-9042-357315be7ba9"
                     },
                     "id": 15,
                     "place_position": {
@@ -1743,7 +1743,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "04ce8618-3dbd-434a-882e-4379d6a52286"
+                        "guid": "5ddc4f81-2fe0-4bab-acf1-6fa4d3e24292"
                     }
                 },
                 {
@@ -1767,7 +1767,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "d5d5da97-48b3-4b89-8096-0c64cd060d09"
+                        "guid": "47dd0129-1d86-4928-92cb-5136ca0161e7"
                     },
                     "cut_position_b": {
                         "data": {
@@ -1788,7 +1788,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "c4b8f7e8-4907-4f74-b1cb-5cea1694632a"
+                        "guid": "bf5c796b-7a46-4f73-a07c-f4dffb8ce812"
                     },
                     "glue_position_a": {
                         "data": {
@@ -1809,7 +1809,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "2d9fb671-8086-4249-b28e-4731760c2576"
+                        "guid": "b72d87ed-c4e3-4d53-9ca1-2d01d6e7cf02"
                     },
                     "glue_position_b": {
                         "data": {
@@ -1830,7 +1830,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "e80a43f2-275b-466a-a2e4-e74122909766"
+                        "guid": "bd9eeb42-b469-49b1-be08-cd9f32ac89c1"
                     },
                     "id": 16,
                     "place_position": {
@@ -1852,7 +1852,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "b8112bfe-8b57-4234-ace3-650113bb5847"
+                        "guid": "f4872593-3d70-4f04-a583-73d28ffece03"
                     }
                 },
                 {
@@ -1876,7 +1876,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "abfc0c4a-36d5-4f8e-93a8-c604b188be96"
+                        "guid": "9e7fe705-7559-4750-b680-97e10f1943af"
                     },
                     "cut_position_b": {
                         "data": {
@@ -1897,7 +1897,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "7c03d493-b602-43e5-b904-c5aa911c7d49"
+                        "guid": "6e9cd36d-4bb0-4b67-9ace-b65f4b2b0444"
                     },
                     "glue_position_a": {
                         "data": {
@@ -1918,7 +1918,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "cd31df8b-ead5-46bc-b93a-fd8711b08feb"
+                        "guid": "b0732276-2244-4117-b7bb-7b2b0d423902"
                     },
                     "glue_position_b": {
                         "data": {
@@ -1939,7 +1939,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "47bea641-7907-4290-bc8d-959c41f89143"
+                        "guid": "0b708ec4-1f7a-44fc-83c8-20b9e0fe4a2b"
                     },
                     "id": 17,
                     "place_position": {
@@ -1961,7 +1961,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "8345950c-6b33-49ab-b034-02626cc15630"
+                        "guid": "79e490fb-b688-45a2-bf57-7ad479da6f8c"
                     }
                 },
                 {
@@ -1985,7 +1985,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "4fc33921-a70d-4ba6-93c9-29ab93401f09"
+                        "guid": "cd3a6563-14a9-4c83-a176-9b6441d30eff"
                     },
                     "cut_position_b": {
                         "data": {
@@ -2006,7 +2006,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "1762f325-2b48-4c5b-86c6-8f7e8266a00e"
+                        "guid": "f9d6dd5b-343d-46d0-a6b3-a2271389c135"
                     },
                     "glue_position_a": {
                         "data": {
@@ -2027,7 +2027,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "e21a2c8a-b745-4486-bbf1-7cf3f2bc905b"
+                        "guid": "98d07fcd-c345-4f63-b1fa-ada4a2fad661"
                     },
                     "glue_position_b": {
                         "data": {
@@ -2048,7 +2048,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "1913bc30-8008-4b8d-a251-42f90fa36783"
+                        "guid": "6ec492da-7ccb-41b2-9805-8de2f6685ac6"
                     },
                     "id": 18,
                     "place_position": {
@@ -2070,7 +2070,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ddb24941-29e5-4931-820c-7f9e776445d5"
+                        "guid": "d9cc83a8-db94-4d71-9914-7189a89ea100"
                     }
                 },
                 {
@@ -2094,7 +2094,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "e122aa16-789a-408f-abb9-4d59007e44a1"
+                        "guid": "4b740957-9bb6-411a-81ef-f504c91dfe44"
                     },
                     "cut_position_b": {
                         "data": {
@@ -2115,7 +2115,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ffa66b54-4013-4d9f-acb5-d5515c22168b"
+                        "guid": "bde2bcf0-02cd-4889-9e33-8efa6c377395"
                     },
                     "glue_position_a": {
                         "data": {
@@ -2136,7 +2136,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "7bb57e56-b53f-4732-8797-986f838027b5"
+                        "guid": "f0b5916b-ea35-4a3a-a2b9-cce7b2535dd3"
                     },
                     "glue_position_b": {
                         "data": {
@@ -2157,7 +2157,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "a2e751c0-ac0b-4a42-bf8a-b06a13c1052c"
+                        "guid": "5c2c48b8-81de-443e-8392-f22d7ce81d3e"
                     },
                     "id": 19,
                     "place_position": {
@@ -2179,7 +2179,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "92ced172-0ed2-4b9e-9238-c85fe8efd380"
+                        "guid": "916256b7-610a-43a1-9809-dfe17c8b63d5"
                     }
                 },
                 {
@@ -2203,7 +2203,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "60fb2d66-8fce-4971-9467-d67574c516e0"
+                        "guid": "c985fc92-f1d6-43f0-85ea-8733c778dbeb"
                     },
                     "cut_position_b": {
                         "data": {
@@ -2224,7 +2224,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "4b9da55f-d7cc-49a8-b6f4-d4107d2deb19"
+                        "guid": "ed04b6a8-82ad-41c8-a988-71a56c2bf610"
                     },
                     "glue_position_a": {
                         "data": {
@@ -2245,7 +2245,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "467463b9-43d2-4f23-bdec-907ef8b43982"
+                        "guid": "d5e36b8f-bbee-45a2-a76f-c934920b5c87"
                     },
                     "glue_position_b": {
                         "data": {
@@ -2266,7 +2266,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "0ee0f79a-8786-4e86-88d7-40ae4f6463b9"
+                        "guid": "16a0b6e5-2559-4123-839e-d21c9f215222"
                     },
                     "id": 20,
                     "place_position": {
@@ -2288,7 +2288,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "a5604011-b184-4e6b-b0da-81840a581cb3"
+                        "guid": "149d98cd-7ebf-4df5-8a81-79e3f8d0a1a5"
                     }
                 },
                 {
@@ -2312,7 +2312,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "6ef0ae83-109f-450d-8e33-ca81943e5059"
+                        "guid": "f88249d5-0744-4710-9c2d-cd489cac5b25"
                     },
                     "cut_position_b": {
                         "data": {
@@ -2333,7 +2333,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "574b7688-dbcd-44b1-b6c4-a822372ddce1"
+                        "guid": "2b117dca-cb8a-47f5-b60b-c9691bf1368b"
                     },
                     "glue_position_a": {
                         "data": {
@@ -2354,7 +2354,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "c7ae025d-fcc1-40b0-a0c3-be0ff29218a1"
+                        "guid": "97679d08-1c88-4f38-ab5a-7f664cd0abc1"
                     },
                     "glue_position_b": {
                         "data": {
@@ -2375,7 +2375,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "64aa44d1-d6ba-4354-baf1-6aa772de1615"
+                        "guid": "5b2be838-45d6-42b0-a68c-825ffd351444"
                     },
                     "id": 21,
                     "place_position": {
@@ -2397,7 +2397,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "2764c086-fbd6-45b1-a3d8-9560e55948ea"
+                        "guid": "c82b4096-c7bb-418b-a048-95408faeb8d1"
                     }
                 },
                 {
@@ -2421,7 +2421,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "03cffb8e-6abf-4461-aa3c-9baba1369bac"
+                        "guid": "9980ce05-066e-49c6-8ffc-fdce51b818cf"
                     },
                     "cut_position_b": {
                         "data": {
@@ -2442,7 +2442,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "e136ace4-5c34-4922-8215-c04f6d28fd22"
+                        "guid": "326a20b6-deb8-4d39-8936-61c7425df9b2"
                     },
                     "glue_position_a": {
                         "data": {
@@ -2463,7 +2463,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "46f54646-fb5e-4288-9410-cfaf797ed4d9"
+                        "guid": "9af34ff4-8ecc-4cf5-a873-809f054767e7"
                     },
                     "glue_position_b": {
                         "data": {
@@ -2484,7 +2484,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "bc830140-55b3-4347-8684-99cee5a00a15"
+                        "guid": "3f840aa5-9986-4da7-9a52-ef3a47cc4659"
                     },
                     "id": 22,
                     "place_position": {
@@ -2506,7 +2506,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "7edeab42-45db-4842-9625-2654699ae6bb"
+                        "guid": "a2404270-3df4-4595-bf76-d8c46565bca2"
                     }
                 }
             ],
@@ -2535,7 +2535,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "2e7e00c2-6329-44ae-97e4-a8590238aaa9"
+                        "guid": "42bc0464-2bab-4043-9b95-65817805c564"
                     },
                     "cut_position_b": {
                         "data": {
@@ -2556,7 +2556,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "7c01fc4a-5ad3-40ff-afd3-4e7d7f3ac5d3"
+                        "guid": "d169bc69-fe25-4ee6-a299-80653f1ef41f"
                     },
                     "glue_position_a": {
                         "data": {
@@ -2577,7 +2577,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "60b471c2-d798-4ec7-8283-c0278212c5d8"
+                        "guid": "82b5f29a-386d-4b15-938a-aadc0831165f"
                     },
                     "glue_position_b": {
                         "data": {
@@ -2598,7 +2598,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "984a8f1a-b2e5-48d9-a791-f9dc521c9d84"
+                        "guid": "1e0cc98e-525d-4825-9bc1-ddedd03946a6"
                     },
                     "id": 0,
                     "place_position": {
@@ -2620,7 +2620,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "66a1a8e2-2761-43f5-90d2-a7c5099dcd66"
+                        "guid": "86326c62-dd51-4d28-a95e-c41e1b195fa6"
                     }
                 },
                 {
@@ -2644,7 +2644,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "53c7137a-9204-473d-b877-f86624323baa"
+                        "guid": "a848339f-5c35-4eb8-88f7-9b9c73a07d85"
                     },
                     "cut_position_b": {
                         "data": {
@@ -2665,7 +2665,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ca454460-b8ee-427a-aef4-7b994df61d7f"
+                        "guid": "565268bd-9f69-4fdd-ba19-3f765a9c1cd8"
                     },
                     "glue_position_a": {
                         "data": {
@@ -2686,7 +2686,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "c267d2c1-7984-470a-8835-b4edeb523974"
+                        "guid": "466dbdba-2d43-4a90-8680-d54fcd5cf6a3"
                     },
                     "glue_position_b": {
                         "data": {
@@ -2707,7 +2707,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "924016d9-b675-4cde-96b1-df75622bd728"
+                        "guid": "dc2e4dfc-4594-4cff-bed7-3bfc8e6b6fd4"
                     },
                     "id": 1,
                     "place_position": {
@@ -2729,7 +2729,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "6dd61a3f-e7ce-4632-948a-a6967e7ce47f"
+                        "guid": "1983e156-fb85-4f5b-bfd0-40a598580117"
                     }
                 },
                 {
@@ -2753,7 +2753,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "9de712b3-c463-4e32-86cb-14b14eaa13ae"
+                        "guid": "9bbddf8b-b119-40cf-bb85-d3c2a1fbe604"
                     },
                     "cut_position_b": {
                         "data": {
@@ -2774,7 +2774,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "bb6812f5-de10-4e3c-b1c4-eb1ff54b48e6"
+                        "guid": "03d0660c-3901-4ae9-afeb-8f276e6cf007"
                     },
                     "glue_position_a": {
                         "data": {
@@ -2795,7 +2795,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "df46dae5-4f34-4921-92da-73bfff913ffe"
+                        "guid": "7676b512-48a7-45a1-ac0c-98ba85fb78a5"
                     },
                     "glue_position_b": {
                         "data": {
@@ -2816,7 +2816,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "2c58e718-84e9-4881-9b8e-bbcb8715c3ee"
+                        "guid": "9854be07-e456-49dc-86f1-3deaa47f0d06"
                     },
                     "id": 2,
                     "place_position": {
@@ -2838,7 +2838,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "48b1c132-9654-48b7-a35f-b7420c806b6e"
+                        "guid": "7488e6f3-e2de-49d6-aa1a-2d115c6a3bb2"
                     }
                 },
                 {
@@ -2862,7 +2862,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "d801856d-7c5e-4387-a05b-24750feeb51c"
+                        "guid": "fd9c802c-544e-4041-bd1c-2367ecb1ad8c"
                     },
                     "cut_position_b": {
                         "data": {
@@ -2883,7 +2883,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "454ab68e-3e00-4732-a149-e54be1fa68a5"
+                        "guid": "55af6fa7-6db2-497a-a633-8b6b2db2fd25"
                     },
                     "glue_position_a": {
                         "data": {
@@ -2904,7 +2904,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "d3380b53-20fa-43a6-99ad-f92c9a52aefb"
+                        "guid": "93458541-1ce8-460e-9600-acedff7b17d1"
                     },
                     "glue_position_b": {
                         "data": {
@@ -2925,7 +2925,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "1896ff65-3be4-490d-b641-c5610e1e4c5e"
+                        "guid": "bed9d833-f284-453f-a993-be0182aa1c7e"
                     },
                     "id": 3,
                     "place_position": {
@@ -2947,7 +2947,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "236bb39f-4e2c-4b1e-a62d-4601c01c9ca6"
+                        "guid": "620c30fb-cb56-47d8-aea8-b05b6991ea68"
                     }
                 },
                 {
@@ -2971,7 +2971,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "81c4af36-d1a8-4bd6-adf1-edaf659e11a7"
+                        "guid": "57b55b1a-2f3b-443e-9fb6-2294bccbcf62"
                     },
                     "cut_position_b": {
                         "data": {
@@ -2992,7 +2992,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "8706cb7c-976a-4024-970a-37857ce83208"
+                        "guid": "7eb66783-6c78-4fe6-b50b-8c459b1ecffe"
                     },
                     "glue_position_a": {
                         "data": {
@@ -3013,7 +3013,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "b8659b49-9d46-4b1d-b91a-44a1d6a135e0"
+                        "guid": "bcf846ec-b4d2-40cc-ab86-41dff4015751"
                     },
                     "glue_position_b": {
                         "data": {
@@ -3034,7 +3034,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "cd4d0b06-1866-4ee9-b503-2c10e57123e7"
+                        "guid": "89fe9d28-5102-40d1-9ae0-b832bca812d8"
                     },
                     "id": 4,
                     "place_position": {
@@ -3056,7 +3056,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "f76e510c-77f7-42d9-81f5-02931d19c135"
+                        "guid": "7c82a692-5ef1-42cd-9b57-32aa3d6b72ef"
                     }
                 },
                 {
@@ -3080,7 +3080,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "22974433-a6d6-41f7-ba4e-cda3642d583c"
+                        "guid": "3dbfd076-0a27-4b4a-8a09-0b16ce90081f"
                     },
                     "cut_position_b": {
                         "data": {
@@ -3101,7 +3101,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "0b2699fd-2979-4079-8753-3c5b3154a22e"
+                        "guid": "15516ae8-9159-4b26-94c3-db5daf732326"
                     },
                     "glue_position_a": {
                         "data": {
@@ -3122,7 +3122,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "30ae1bd4-70b3-4471-8243-7609ceda78af"
+                        "guid": "f60e3723-852e-4062-817a-9c123d80e584"
                     },
                     "glue_position_b": {
                         "data": {
@@ -3143,7 +3143,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "1ec0eec4-f81d-4cf8-9be5-1c13a5c64fd7"
+                        "guid": "9b1cf7f3-26a6-40bc-9c7f-5bbfbfe40841"
                     },
                     "id": 5,
                     "place_position": {
@@ -3165,7 +3165,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "1bb5d43e-41e7-48e0-8137-a2eb2252617d"
+                        "guid": "7aa59441-29d8-4639-a309-8dbad7290710"
                     }
                 },
                 {
@@ -3189,7 +3189,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "44072e0c-f070-4ad8-9195-4447fcbdc9a8"
+                        "guid": "b71bff11-8feb-458a-98c4-9fe76e368674"
                     },
                     "cut_position_b": {
                         "data": {
@@ -3210,7 +3210,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "6c5509b9-3d68-4dab-96df-d58851c74149"
+                        "guid": "e856c651-4048-4cca-a251-667c4f4be8ee"
                     },
                     "glue_position_a": {
                         "data": {
@@ -3231,7 +3231,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "e69e3d54-2f8a-432b-a0ed-f6ec8e2ff837"
+                        "guid": "dfb7b86f-46cd-4fad-9869-d55b0f4877b4"
                     },
                     "glue_position_b": {
                         "data": {
@@ -3252,7 +3252,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "4bc60dd6-9a35-41f9-bc3f-3ba4b821d72b"
+                        "guid": "5fe0033e-9b97-40d1-b993-80db1cd1cf19"
                     },
                     "id": 6,
                     "place_position": {
@@ -3274,7 +3274,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "6486badf-7489-4769-8a19-f2033a557b4b"
+                        "guid": "18ba6b5d-9b09-44ef-a168-a3f41a2b188b"
                     }
                 },
                 {
@@ -3298,7 +3298,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "083f9aa8-f8cb-44a5-a397-ce861d12d074"
+                        "guid": "6e1c64e8-4892-4134-907b-bd601ddfa548"
                     },
                     "cut_position_b": {
                         "data": {
@@ -3319,7 +3319,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "1e6eef42-c3a8-4515-ae1d-55d442f9a06d"
+                        "guid": "236d8cc9-7844-452c-a6fc-6cb48be6b3b8"
                     },
                     "glue_position_a": {
                         "data": {
@@ -3340,7 +3340,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "35860f10-83e3-449c-8f13-04ed47c9292a"
+                        "guid": "b21507f1-e8a9-4a05-9180-7b239ebb2ff1"
                     },
                     "glue_position_b": {
                         "data": {
@@ -3361,7 +3361,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "fe0978b1-e557-4b14-ab4c-9433910d0f5b"
+                        "guid": "4ee810c0-bdc0-437d-8887-9e9ba7735a4d"
                     },
                     "id": 7,
                     "place_position": {
@@ -3383,7 +3383,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "675eb34b-652c-45ff-be91-4696653d4a30"
+                        "guid": "004c2dfd-9848-42ba-9086-538e889f9da7"
                     }
                 },
                 {
@@ -3407,7 +3407,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "264981a6-597b-494d-b040-4bf2c109b0e8"
+                        "guid": "9bf40ea6-42f6-4a60-a123-26d5d31a01af"
                     },
                     "cut_position_b": {
                         "data": {
@@ -3428,7 +3428,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "a2b53bca-4271-4fda-b0fe-2d69e093962f"
+                        "guid": "9595848d-ebb8-45fe-9b1e-0b8d74978f2e"
                     },
                     "glue_position_a": {
                         "data": {
@@ -3449,7 +3449,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ff433852-357e-403c-b7eb-8f5ffca7c8fc"
+                        "guid": "60073f87-3d7e-4c52-8e5a-b79b247858e1"
                     },
                     "glue_position_b": {
                         "data": {
@@ -3470,7 +3470,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ac01c96e-1e96-4def-adc7-bdcfc707e292"
+                        "guid": "344a7cab-6f31-402b-8cef-a99d143d1390"
                     },
                     "id": 8,
                     "place_position": {
@@ -3492,7 +3492,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "467bd71c-ad76-4494-9c50-f6db9529b9be"
+                        "guid": "1a295d7e-47d9-4d86-ad13-2b8c0dfb9db3"
                     }
                 },
                 {
@@ -3516,7 +3516,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "bd3839a7-1162-463f-8023-a061308b17db"
+                        "guid": "dd33a2da-d56c-4b86-a585-f65dc94a2516"
                     },
                     "cut_position_b": {
                         "data": {
@@ -3537,7 +3537,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "37b457b2-1243-4617-bc00-986a09949bca"
+                        "guid": "b647ddbd-ffad-4c5f-8ad6-c97a59088ede"
                     },
                     "glue_position_a": {
                         "data": {
@@ -3558,7 +3558,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "c8e7a423-23ec-4838-89f6-0f91710876ea"
+                        "guid": "58f02940-8385-495c-9c4c-af40cfd0c612"
                     },
                     "glue_position_b": {
                         "data": {
@@ -3579,7 +3579,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "f2f13501-1af0-4fbb-a493-5b270a04fa47"
+                        "guid": "97fceeeb-64b0-4aef-a7f6-ec75da206536"
                     },
                     "id": 9,
                     "place_position": {
@@ -3601,7 +3601,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "72de902a-fb2c-423b-aa27-ac9b8f30768c"
+                        "guid": "2ff0527a-fbff-4df8-b76b-11c474501b61"
                     }
                 },
                 {
@@ -3625,7 +3625,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "6808e86b-e5f4-4d2c-bba2-5d9477066e0b"
+                        "guid": "034b4489-4581-4390-a7f7-608475b5d9db"
                     },
                     "cut_position_b": {
                         "data": {
@@ -3646,7 +3646,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "fc72fbfb-0697-44fd-af2b-60aa939152e1"
+                        "guid": "d1ff420a-964a-4a62-b294-7e7c2337190b"
                     },
                     "glue_position_a": {
                         "data": {
@@ -3667,7 +3667,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ff6a6528-5e56-4d65-af74-dcf2cb8d15f4"
+                        "guid": "0aed4f0f-6b66-4bf6-a6d1-a64343210d64"
                     },
                     "glue_position_b": {
                         "data": {
@@ -3688,7 +3688,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "adab9e86-25c5-4705-a876-85206fd4590c"
+                        "guid": "840676b5-a140-432d-a057-27a1783fe70c"
                     },
                     "id": 10,
                     "place_position": {
@@ -3710,7 +3710,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ab91212b-ff60-4e05-88e5-662b80232c44"
+                        "guid": "8f3b5da4-bc8d-46f7-80cd-b0cb6842fb93"
                     }
                 },
                 {
@@ -3734,7 +3734,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "802f1696-6b71-41af-a827-82bcd867b5ce"
+                        "guid": "b970f7e0-2689-4961-8745-eeafe8f8392c"
                     },
                     "cut_position_b": {
                         "data": {
@@ -3755,7 +3755,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "7cee499c-e0f9-45bb-97db-39dec5a511e1"
+                        "guid": "9019dbc9-ace2-4d4a-a4fd-8a4668845eee"
                     },
                     "glue_position_a": {
                         "data": {
@@ -3776,7 +3776,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "5ebe674a-4186-4731-8ba6-32a1d020b534"
+                        "guid": "37a35f34-f287-42cd-88af-ed4372a80e1a"
                     },
                     "glue_position_b": {
                         "data": {
@@ -3797,7 +3797,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "01e349e6-535b-4686-8395-bee70a3db73a"
+                        "guid": "d39d4fe4-3ec1-4f26-9df2-d6e9033f633c"
                     },
                     "id": 11,
                     "place_position": {
@@ -3819,7 +3819,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "e5f9ce25-23cb-4eb3-b87b-c9c16c826cb8"
+                        "guid": "aec3b97b-33eb-49ec-a12f-5bc0b9153232"
                     }
                 },
                 {
@@ -3843,7 +3843,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "226d50de-bdcb-4769-b2d7-5cfd58abae71"
+                        "guid": "a9992f5e-e348-4cd0-b210-e028e1d42303"
                     },
                     "cut_position_b": {
                         "data": {
@@ -3864,7 +3864,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "3d8f4547-9323-4d25-9989-873b090abc33"
+                        "guid": "0609b11d-8f10-4ca3-b572-55c625945fb9"
                     },
                     "glue_position_a": {
                         "data": {
@@ -3885,7 +3885,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ff1a6563-5630-44f0-a4b7-b80b85047f9b"
+                        "guid": "283bb694-4456-44dc-bdbb-fe2a8c8ad279"
                     },
                     "glue_position_b": {
                         "data": {
@@ -3906,7 +3906,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "f8e1f7ea-1abf-4e3c-ac4c-a239a1b266af"
+                        "guid": "ad0f85e8-b89d-4c05-8641-d17e4b1f090d"
                     },
                     "id": 12,
                     "place_position": {
@@ -3928,7 +3928,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "be1594fa-baa1-4c7b-a97d-a7868370560a"
+                        "guid": "ddacd7c4-9a71-4f4a-a615-d197d225cf20"
                     }
                 },
                 {
@@ -3952,7 +3952,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "66f21a3d-cf40-421a-a66d-dd825ef2f19d"
+                        "guid": "14a2c5e6-9d3a-44cd-9120-7ab2e1a2cdcc"
                     },
                     "cut_position_b": {
                         "data": {
@@ -3973,7 +3973,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "be6160c4-22d6-44be-9bd2-d80b775d656c"
+                        "guid": "e614189b-41f2-4769-8eb5-32a97e5cd5e0"
                     },
                     "glue_position_a": {
                         "data": {
@@ -3994,7 +3994,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "83477080-7e6f-497c-9d95-2f9c2f002764"
+                        "guid": "31e0e81f-7d85-44d3-89b8-5f2ad1d53579"
                     },
                     "glue_position_b": {
                         "data": {
@@ -4015,7 +4015,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "acad3379-4e4d-407b-9a7b-ff7f536ae6e3"
+                        "guid": "b8e1786e-4293-4233-9585-b3f3c2fd0eb9"
                     },
                     "id": 13,
                     "place_position": {
@@ -4037,7 +4037,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "ead2a9a2-393c-4fb5-a85f-77ffb7bc4986"
+                        "guid": "4a145a8f-da7f-47d4-bb7e-420df7e57fe8"
                     }
                 },
                 {
@@ -4061,7 +4061,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "c0e95593-8d55-447d-805a-b5d00ed2d4ae"
+                        "guid": "b834c58f-84ef-4934-b263-306104ada3e0"
                     },
                     "cut_position_b": {
                         "data": {
@@ -4082,7 +4082,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "3e5b603a-89b6-48c4-a036-fea61fffeeb3"
+                        "guid": "50d1e5a2-356f-4c84-9a0b-134d2c6fbd3e"
                     },
                     "glue_position_a": {
                         "data": {
@@ -4103,7 +4103,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "88de44c8-078b-41f0-b037-fe54b26d908a"
+                        "guid": "ce718677-7046-471d-8a59-b3bd21b79aa5"
                     },
                     "glue_position_b": {
                         "data": {
@@ -4124,7 +4124,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "893283eb-8636-47b8-81fe-710bff669a86"
+                        "guid": "4ee5adab-452a-4b8d-be96-413168a9d1c9"
                     },
                     "id": 14,
                     "place_position": {
@@ -4146,7 +4146,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "344ddf5e-9463-463b-b438-1a68d7489ec8"
+                        "guid": "b3028c08-2ce2-4351-8dc4-9325882961b0"
                     }
                 },
                 {
@@ -4170,7 +4170,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "b5f1af7f-ae13-4b64-aace-d156b1245c09"
+                        "guid": "1ca3ccd8-c7f4-4fe9-82ce-8abe96e19be4"
                     },
                     "cut_position_b": {
                         "data": {
@@ -4191,7 +4191,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "8fcd3e6c-a130-4e2f-9b81-e08d942e3740"
+                        "guid": "826520be-187b-4b97-9b73-f8fe0ee6ad6f"
                     },
                     "glue_position_a": {
                         "data": {
@@ -4212,7 +4212,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "d786ff26-3ccd-4b93-801a-3aa8f62ec221"
+                        "guid": "c10c6757-8618-49fe-a326-cab9bb2ed1cc"
                     },
                     "glue_position_b": {
                         "data": {
@@ -4233,7 +4233,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "b2e6787d-24e0-49a5-9b08-1a03c7bdf732"
+                        "guid": "54f54285-5b73-4be7-95c0-93c8d66451c4"
                     },
                     "id": 15,
                     "place_position": {
@@ -4255,7 +4255,7 @@
                             ]
                         },
                         "dtype": "compas.geometry/Frame",
-                        "guid": "58fc1cd2-f064-4352-a01e-aee3ee0d0d56"
+                        "guid": "ef2ab886-d25b-447b-af23-be457990f0dc"
                     }
                 }
             ],
@@ -4264,7 +4264,7 @@
     ],
     "metadata": {
         "beam_section": 25,
-        "created": "2026-04-26T12:14:02.775488",
+        "created": "2026-04-28T16:47:20.965650",
         "frame_size": [
             600,
             2500
