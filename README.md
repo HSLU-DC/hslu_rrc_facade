@@ -32,8 +32,8 @@ Ihr liefert pro Element **5-6 Geometrien** als Grasshopper DataTree mit `{Layer;
 | 1 | Centerline | Line | Mittelachse des fertigen Balkens |
 | 2 | Cut Plane A | Plane | Schnittebene Ende A |
 | 3 | Cut Plane B | Plane | Schnittebene Ende B |
-| 4 | Glue Plane A | Plane | Leimebene 1 (Unterseite, am Rand) |
-| 5 | Glue Plane B | Plane | Leimebene 2 (optional) |
+| 4 | Glue Plane A | Plane | Leimebene 1 (Unterseite) |
+| 5 | Glue Plane B | Plane | Leimebene 2 (Unterseite, optional) |
 
 Alles im **Weltkoordinatensystem** von Rhino (= `ob_HSLU_Place`). Origin liegt oben links am Rahmen.
 
@@ -79,29 +79,101 @@ cd process
 python validate.py
 ```
 
-### 3. Produktion starten
+### 3. RobotStudio-Simulation (empfohlen vor jedem realen Lauf)
+
+Bevor ihr an die echte Anlage geht, könnt ihr euer Design in **ABB RobotStudio** vollständig simulieren — mit dynamisch eingeblendeter Balkengeometrie und kontinuierlicher Kollisionsprüfung. So findet ihr Probleme bevor sie an der Maschine auftreten.
+
+<img src="docs/images/10_robotstudio_overview.png" width="600">
+
+**Setup:**
+
+1. **Pack'n'Go-Datei** in RobotStudio öffnen: `robotstudio/hslu_rrc_facade_v1.0.0.rspag`
+2. **Virtuellen Docker-Container** starten:
+   ```bash
+   cd docker
+   docker compose -f VIRTUAL-docker-compose.yml up -d
+   ```
+3. **Produktionsskript** wie üblich starten:
+   ```bash
+   cd ../process
+   python production.py
+   ```
+
+> **Tipp:** In den RobotStudio-Einstellungen die **Simulationsgeschwindigkeit auf das Maximum** stellen — sonst läuft die Sim in Echtzeit und dauert genauso lange wie die echte Produktion.
+
+<img src="docs/images/11_robotstudio_speed_settings.png" width="500">
+
+**Was die Simulation neu kann:**
+
+- **Dynamische Balkengeometrie** — beim JSON-Export aus Grasshopper wird zusätzlich die Geometrie pro Element exportiert. Der Export dauert dadurch **1-2 Sekunden länger**. In RobotStudio werden die Stäbe in der korrekten Position dargestellt und bewegen sich mit dem Greifer mit.
+- **Kollisionserkennung** — während die Simulation läuft, wird kontinuierlich auf Kollisionen zwischen Roboter, Greifer, Balken und Anlagenteilen geprüft. Erkannte Kollisionen werden **visuell als Markups im 3D-View** angezeigt und zusätzlich **im Log-Fenster** ausgegeben.
+
+<img src="docs/images/12_robotstudio_collision.png" width="600">
+
+### 4. Produktion starten (echte Anlage)
+
+> **Wichtig:** Vor dem Lauf an der echten Anlage in `production.py` **`SIM_FAST = False`** setzen (Default ist `True` für die RS-Simulation in Schritt 3). `SIM_FAST = True` multipliziert alle Verfahrgeschwindigkeiten — auf der echten Anlage gefährlich!
 
 ```bash
-# 1. Docker starten (einmalig)
+# 1. Docker starten (echte Anlage)
 cd docker
-docker compose up -d
+docker compose -f REAL-docker-compose.yml up -d
 
 # 2. Produktion starten
 cd ../process
 python production.py
 ```
 
-### Konfiguration in `production.py`
+#### Interaktiver Start-Dialog
+
+Beim Start fragt das Skript nach was produziert werden soll.
+
+**1. Layer-Auswahl** (nur wenn die Daten mehrere Layer enthalten):
+
+```
+Welcher Layer?
+  [Enter] = beide (alle Elemente)
+  0       = nur Layer 0
+  1       = nur Layer 1
+> _
+```
+
+**2. Element-Bereich:**
+
+```
+Layer 0 hat 12 Elemente (0..11).
+> _
+```
+
+| Eingabe | Bedeutung |
+|---|---|
+| `Enter` | alle Elemente des Layers |
+| `5-10` | Elemente 5 bis 10 (inklusive) |
+| `12` | nur Element 12 |
+
+**3. Lager-Check:** das Skript zählt automatisch wie viele Stäbe pro Kategorie (400 / 550 / 750 / 1000 mm) gebraucht werden und vergleicht mit dem Inventar in `wood_storage.json`. Ist nicht genug da, fragt es ab, wie viele Stäbe ihr nachgelegt habt.
+
+> **Lager leer mid-production:** Wenn unterwegs ein Bucket leer wird, **bricht das Skript nicht ab**. Der Roboter pausiert, ihr legt Stäbe nach und gebt im Terminal die nachgelegte Anzahl ein — die Produktion läuft danach automatisch weiter.
+
+#### Optionale Toggle-Flags in `production.py`
+
+Falls ihr einzelne Stationen oder Werkzeug-Aktivierungen für Tests umgehen wollt, ändert die Flags am Anfang der Datei:
 
 ```python
-LAYER    = 0      # Welcher Layer (0 oder 1)
-N_RUNS   = 1      # Wie viele Elemente produzieren
-START_I  = 0      # Ab welchem Element-Index starten
-
-DO_PICK  = True   # Stationen ein/aus (zum Testen)
+# Stationen ein/aus (Roboter fährt trotzdem die Wege zwischen den Stationen)
+DO_PICK  = True
 DO_CUT   = True
 DO_GLUE  = True
 DO_PLACE = True
+
+# Werkzeuge ein/aus (False = Bewegung wird ausgeführt, aber Werkzeug bleibt inaktiv)
+CSS_ENABLED        = True   # Cartesian Soft Servo am Pick (sanftes Greifen)
+SAW_ENABLED        = True   # Säge beim Schneiden
+GLUE_VALVE_ENABLED = True   # Leim-Ventil beim Leimen
+
+# Simulation-only Flags (auf der echten Anlage egal / muss aus)
+SIM_FAST  = False   # MUSS False auf echter Anlage! (True nur für RS-Sim, x4 Speed)
+SIM_BEAMS = True    # BeamSimulator in RS — auf echter Anlage wirkungslos
 ```
 
 ## Requirements

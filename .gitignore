@@ -46,5 +46,8 @@ obj/
 # RobotStudio VC backups
 robotstudio/backup/
 
+# RobotStudio Pack'n'Go station archives (too large for GitHub, distribute via NAS)
+robotstudio/*.rspag
+
 # Runtime-generated STL geometry
 process/data/geometry/

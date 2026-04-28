@@ -66,9 +66,30 @@ Die Mittelachse des **fertigen** (zugeschnittenen) Balkens als Linie. Die Center
 Die Centerline bestimmt automatisch:
 - Die **Platzierungsposition** (Mittelpunkt der Centerline)
 - Die **Platzierungsrichtung** (Richtung der Centerline)
-- Die **beam_size** (Länge der Centerline bestimmt aus welchem Lager das Holz geholt wird: 400, 550, 750 oder 1000 mm)
+- Die **beam_size** (Länge der Centerline bestimmt aus welchem Lager das Holz geholt wird)
 
 <img src="docs/images/03_centerline.png" width="600">
+
+### Stock-Längen und Verschnitt
+
+Im Lager liegen Stäbe in **vier festen Längen**: **400 / 550 / 750 / 1000 mm**.
+
+Aus der Centerline-Länge wird automatisch der **nächst-grössere** Bucket gewählt; die Differenz wird in der Cut-Station weggeschnitten.
+
+| Centerline-Länge | Stock-Länge (= beam_size) | Verschnitt |
+|---|---|---|
+| 0 - 400 mm   | 400 mm  | bis zu 400 mm |
+| 401 - 550 mm | 550 mm  | bis zu 150 mm |
+| 551 - 750 mm | 750 mm  | bis zu 200 mm |
+| 751 - 1000 mm | 1000 mm | bis zu 250 mm |
+
+**Maximale Centerline-Länge: 1000 mm** (längster verfügbarer Stock).
+
+**Minimale Centerline-Länge:** abhängig von der Länge **und** vom Schnittwinkel zur Kreissäge — kurze Stäbe mit steilen Gehrungsschnitten können vom Greifer aus nicht erreichbar sein. **Prüft das in der GH-IK-Vorschau** für eure spezifischen Geometrien.
+
+### Greifer-Position
+
+Der Greifer fasst den Stab **immer mittig** (im Schwerpunkt). Diese Annahme ist im GH-Template fest hinterlegt — ihr müsst die Greifposition nicht selbst angeben.
 
 ---
 
@@ -111,27 +132,42 @@ Die Schnittebene am **zweiten Ende** des Balkens (Endpunkt der Centerline). Iden
 Die erste Leimebene definiert, wo der Roboter Leim aufträgt. Der Leim wird in der Leimstation auf die **Unterseite** des Balkens aufgetragen, bevor das Element platziert wird.
 
 **Position:**
-- Am **Rand/Ende** des Balkens
-- In der **Mitte** der Leimfläche
+- Auf der **Unterseite** des Balkens (= Kontaktfläche zum Element darunter)
+- In der **Mitte** der Leimfläche (Plane sitzt 12.5mm von allen Rändern entfernt)
 - Die Leimfläche ist 25 x 25mm (= Querschnitt des Balkens)
-- Die Plane sitzt 12.5mm von allen Rändern der Leimfläche entfernt
+- **Entlang des Balkens:** dort wo der Balken auf einem anderen Element oder dem Grundrahmen aufliegt — am Ende ODER weiter innen (siehe 90°-Regel unten)
 
 **Orientierung:**
 - **Z-Achse:** zeigt **nach unten** (Richtung Unterlage / Rahmen)
 - **X-Achse:** zeigt **Richtung Mitte** des Elements (entlang der Centerline, zur Balkenmitte hin)
 - **Y-Achse:** ergibt sich automatisch
 
-**Warum am Rand?** Der Leim muss dort aufgetragen werden, wo der Balken auf einem anderen Element oder dem Grundrahmen aufliegt. Das ist typischerweise an den Enden des Balkens, wo er ein darunterliegendes Element kreuzt.
+**Wo soll die Leimebene sitzen?** Dort wo der Balken auf einem anderen Element oder dem Grundrahmen aufliegt. Das kann am Ende sein (typisch bei kreuzenden Elementen) oder weiter innen — wichtig ist die strukturelle Verbindung.
 
 <img src="docs/images/05_glue_plane_orientierung.png" width="600">
+
+### 90°-Regel bei innen liegender Leimebene
+
+Liegt die Leimebene mehr als **100mm vom Balkenende** entfernt (entlang der Centerline gemessen), muss sie um **90° um die Plane-Z-Achse** gedreht werden. Hintergrund: hinter der Leimdüse steht der **Drucker**. In der normalen Orientierung würde der Stab über die Düse hinaus nach hinten ragen und mit dem Drucker kollidieren. Durch die 90°-Drehung wird der Stab seitlich statt längs zur Düse geführt — der Bereich hinter der Düse bleibt frei.
+
+In **welche Richtung** (CW oder CCW um Z) gedreht werden muss, hängt davon ab, wie der gedrehte Stab in den verfügbaren Bauraum passt. Probiert beide Drehrichtungen aus und prüft in Grasshopper:
+
+1. **Erreichbarkeit** der Roboterpose in der IK-Vorschau
+2. **Kollisionsfreiheit mit der Einhausung** — die Einhausung ist im GH-Template bereits modelliert und visuell sichtbar
+
+Die RobotStudio-Simulation (siehe README, Workflow-Schritt 3) prüft zusätzlich die gesamte Anlage auf Kollisionen (Roboter, Greifer, weitere Anlagenteile) — als Schluss-Verifikation vor dem realen Lauf.
+
+> **Hinweis zur Orientierung nach der Drehung:** Nach der 90°-Drehung zeigt die Plane-X-Achse nicht mehr „Richtung Balkenmitte" wie unter § 4 oben beschrieben, sondern senkrecht zum Balken. Das ist in diesem Fall **erlaubt und gewollt** — die ursprüngliche X-Achsen-Konvention gilt nur für nicht gedrehte Planes (innerhalb 100 mm vom Balkenende).
+
+<img src="docs/images/07_glue_plane_innen_90deg.png" width="600">
 
 ---
 
 ## 5 - Glue Plane B (Leimebene 2, optional)
 
-Die zweite Leimebene am **anderen Ende** des Balkens. Identische Konvention wie Glue Plane A.
+Die zweite Leimebene am **anderen Ende / an einer anderen Auflagestelle** des Balkens. Identische Konvention wie Glue Plane A — inkl. der **90°-Regel bei innen liegender Plane** (>100mm vom Balkenende).
 
-Glue Plane B ist **optional** und kann weggelassen werden, wenn der Balken nur an einem Ende verleimt werden muss.
+Glue Plane B ist **optional** und kann weggelassen werden, wenn der Balken nur an einer Stelle verleimt werden muss.
 
 **Wann brauche ich zwei Leimebenen?**
 - Wenn der Balken an **beiden Enden** auf einem anderen Element aufliegt (typisch bei Layer 1)
@@ -163,7 +199,11 @@ Glue Plane B ist **optional** und kann weggelassen werden, wenn der Balken nur a
 |-----------|------|
 | Rahmengrösse | X: 0 - 2500mm, Y: 0 - -600mm |
 | Balkenquerschnitt | 25 x 25mm |
+| Stock-Längen (beam_size) | 400 / 550 / 750 / 1000 mm (automatisch aus Centerline gewählt) |
+| Max Centerline-Länge | 1000 mm |
+| Min Centerline-Länge | abhängig von Schnittwinkel — in GH-IK-Vorschau prüfen |
 | Maximale Anzahl Layer | 2 |
 | Schnitttyp | Nur Gehrungsschnitte (1D) |
 | Leimebenen pro Element | 1 - 2 |
+| Leimebenen-Position | beliebig entlang Balken; ab 100mm vom Ende muss die Plane um 90° um Z gedreht werden (Drehrichtung kollisionsfrei zur Einhausung wählen — siehe § 4) |
 | Platzierungsreihenfolge | = Reihenfolge im DataTree |
