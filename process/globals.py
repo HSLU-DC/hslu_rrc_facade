@@ -43,7 +43,7 @@ SPEED_NO_MEMBER = 500     # Moving without a beam (empty gripper)
 SPEED_WITH_MEMBER = 300   # Moving with a beam in the gripper
 SPEED_APPROACH = 100      # Final approach to target positions
 SPEED_PRECISE = 25        # Pick/place fine positioning
-SPEED_CUT = 25            # Moving through the saw blade
+SPEED_CUT = 20            # Moving through the saw blade
 
 # ==============================================================================
 # Motion controller settings

@@ -50,7 +50,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 #
 # DO NOT enable on the real cell. Sim-only.
 SIM_FAST = False
-SIM_FAST_FACTOR = 4
+SIM_FAST_FACTOR = 8
 
 if SIM_FAST:
     import globals as _g
@@ -98,7 +98,12 @@ DO_PLACE = True
 CSS_ENABLED = True            # Cartesian Soft Servo for gentle gripping at pick
 SAW_ENABLED = True            # Circular saw on/off during cut moves
 GLUE_VALVE_ENABLED = True     # Glue valve pulsing during glue moves
-SIM_BEAMS = False              # BeamSimulator SmartComponent (virtual controller only)
+SIM_BEAMS = False             # BeamSimulator SmartComponent (virtual controller only)
+
+# TEMP: skip the interactive lager-prompt at startup, just use whatever
+# counts are currently in wood_storage.json. Set back to False before any
+# proper production run.
+SKIP_LAGER_PROMPT = True
 
 # Production range (LAYER / START_I / N_RUNS) is asked interactively at runtime.
 # Default = full layer 0; the operator can choose layer + element range.
@@ -456,9 +461,13 @@ def main(*, dry_run=False):
     # ==============================
     # 3. Check Wood Storage
     # ==============================
-    if not dry_run:
+    if not dry_run and not SKIP_LAGER_PROMPT:
         if not check_wood_storage(DATA, production_plan):
             return
+    elif SKIP_LAGER_PROMPT:
+        from _skills.WoodStorage.wood_storage import WoodStorage
+        print("\n[TEMP] SKIP_LAGER_PROMPT=True — Lager-Prompt uebersprungen.")
+        WoodStorage().print_status()
 
     # ==============================
     # 4. Connect Robot

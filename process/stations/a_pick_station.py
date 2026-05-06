@@ -172,6 +172,8 @@ def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True,
     # 4. Linear down to pick_frame
     r1.send(rrc.MoveToFrame(pick_frame, SPEED_PRECISE, rrc.Zone.FINE, rrc.Motion.LINEAR))
 
+    #r1.send(rrc.Stop())
+
     # === CSS + GRIP ===
     # CSS (Cartesian Soft Servo) makes Y and Z axes soft so the gripper
     # conforms to the beam surface. The robot presses 5mm down into the
@@ -188,7 +190,7 @@ def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True,
 
         # Press 5mm down into the beam for secure contact (25mm beam section)
         pick_press = pick_frame.copy()
-        pick_press.point.z -= 10
+        pick_press.point.z -= 20
         r1.send(rrc.MoveToFrame(pick_press, SPEED_PRECISE, rrc.Zone.FINE, rrc.Motion.LINEAR))
 
     r1.send(rrc.WaitTime(0.5))
@@ -196,12 +198,14 @@ def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True,
     # Close the gripper
     gripper_close(r1, dry_run=dry_run, wait=True)
 
-    # Deactivate CSS while the robot is still at the press position. Switching
-    # CSS off later (after the retract) snaps the soft Y/Z axes back to the
-    # path setpoint with the accumulated soft/stiff mismatch in one step,
-    # which trips a servo-lag fault. Doing it here resolves the mismatch at
-    # rest, so the retract runs fully stiff.
-    if css_enabled:
+    # CSS-off timing depends on the lager:
+    # - 400: deactivate immediately at the press position. The 400er stock
+    #   showed a servo-lag fault when CSS was switched off mid-retract, so
+    #   we resolve the soft/stiff mismatch at rest before lifting.
+    # - 550/750/1000: leave CSS active during the retract (deactivated below
+    #   after retract_high) so the lift can yield to compartment edges.
+    css_off_at_press = (beam_size == "400")
+    if css_enabled and css_off_at_press:
         r1.send_and_wait(rrc.CustomInstruction('r_RRC_CI_CSS', ['Off'], []))
 
     # Activate beam geometry in RobotStudio simulation (beam appears at TCP)
@@ -236,12 +240,25 @@ def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True,
     # 3. Linear up to retract_high
     r1.send(rrc.MoveToFrame(retract_high, SPEED_APPROACH, rrc.Zone.Z10, rrc.Motion.LINEAR))
 
+    if css_enabled and not css_off_at_press:
+        r1.send_and_wait(rrc.CustomInstruction('r_RRC_CI_CSS', ['Off'], []))
+
     # 4. Exit to pre-approach offset (Y-150 to clear storage)
     exit_frame = pre_approach.copy()
     exit_frame.point.y -= 150
     r1.send_and_wait(rrc.MoveToFrame(exit_frame, SPEED_WITH_MEMBER, rrc.Zone.Z50, rrc.Motion.LINEAR))
 
     print(f"Left pick station. Took from {compartment_id}.")
+
+
+    """
+    r1.send_and_wait(rrc.MoveToJoints([48,36,26,0,27,49],[],SPEED_WITH_MEMBER,rrc.Zone.FINE))
+
+    r1.send(rrc.Stop())
+
+    gripper_open(r1, dry_run=dry_run, wait=True)
+
+    """
 
 
 if __name__ == "__main__":
