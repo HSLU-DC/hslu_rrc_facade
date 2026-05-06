@@ -125,7 +125,7 @@ def _do_cut_sequence(r1, cut_frame, rotation_point=None, *, dry_run=False,
 
     # Create an offset approach point (80mm above cut)
     cut_approach = cut_frame.copy()
-    cut_approach.point.z += 80
+    cut_approach.point.z += 70
     r1.send(rrc.MoveToFrame(cut_approach, SPEED_WITH_MEMBER, rrc.Zone.Z10, rrc.Motion.LINEAR))
 
     # --- ACTUAL CUTTING ---

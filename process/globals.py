@@ -67,5 +67,11 @@ FRAME_LENGTH = 2500      # mm (X-direction)
 BEAM_SECTION = 25        # mm (cross-section of production beams)
 FRAME_SECTION = 40       # mm (cross-section of base frame beams)
 
+# Wood density used to compute the gripper load mass per beam.
+# 500 kg/m^3 is a conservative average for softwoods (Fichte/Tanne ~450,
+# Lärche ~550). A slight overestimate is safer than an underestimate for
+# motion planning.
+WOOD_DENSITY = 500       # kg/m^3
+
 # Layering: students may build up to MAX_LAYERS stacked on top of each other.
 MAX_LAYERS = 2

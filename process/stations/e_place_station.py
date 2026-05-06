@@ -32,10 +32,13 @@ Student input simplification:
 Motion sequence (Layer 0 & 1, only layers in facade project):
     1. Joint move to approach config (POS/NEG dependent)
     2. Coordinated move to 150mm above place position (track + frame)
-    3. Linear approach: app_frame -> rot_frame -> place_frame
-    4. Wait 2s, open gripper, optionally release SimBeam geometry
-    5. Deactivate GripLoad
-    6. Retract vertically, exit via approach, reset J6
+    3. Linear approach: app_frame -> rot_frame
+    4. CSS (Cartesian Soft Servo) descent: target is 10mm below place_frame
+       so the gripper drives down into contact and the soft Y/Z axes yield
+       at the actual surface height (compensates for layer thickness drift)
+    5. Wait, open gripper, deactivate CSS at rest, optionally release SimBeam
+    6. Deactivate GripLoad
+    7. Retract vertically, exit via approach, reset J6
 """
 
 # ==============================
@@ -154,10 +157,9 @@ def create_intermediate_frames(place_frame, sign, offset):
     Returns:
         (app_frame, rot_frame): Intermediate approach frames
     """
-    # App frame: 80mm above place, slightly offset in Y
+    # App frame: 80mm above place
     app_frame = place_frame.copy()
     app_frame.point.z += 80
-    app_frame.point.y -= 20
 
     # Rot frame: 30mm above place (orientation transition)
     rot_frame = place_frame.copy()
@@ -170,7 +172,7 @@ def create_intermediate_frames(place_frame, sign, offset):
 # Station
 # ==============================================================================
 
-def e_place_station(r1, data, i, *, layer_idx=0, dry_run=False, sim_beams=False):
+def e_place_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True, sim_beams=False):
     """Place beam at target position on facade frame.
 
     The student provides only place_position. All intermediate frames
@@ -182,6 +184,11 @@ def e_place_station(r1, data, i, *, layer_idx=0, dry_run=False, sim_beams=False)
         i: Element index within the layer
         layer_idx: Layer index (0 or 1)
         dry_run: If True, prints planned moves without robot connection
+        css_enabled: If True, activates Cartesian Soft Servo (CSS) for the
+                     final descent. The TCP target is 10mm below the nominal
+                     place_frame; CSS makes Y/Z compliant so the gripper
+                     stops at actual surface contact instead of pushing
+                     through or hovering above.
         sim_beams: If True, releases SimBeam geometry at place position
                    after the gripper opens (virtual controller only)
     """
@@ -239,27 +246,56 @@ def e_place_station(r1, data, i, *, layer_idx=0, dry_run=False, sim_beams=False)
     ))
     print("At place station (150mm above).")
 
-    # 3. Linear approach: app -> rot -> place
+    # 3. Linear approach: app -> rot (stop at rot, then CSS descent)
     r1.send_and_wait(rrc.MoveToFrame(app_frame, SPEED_APPROACH, rrc.Zone.Z10, rrc.Motion.LINEAR))
-    r1.send(rrc.MoveToFrame(rot_frame, SPEED_APPROACH, rrc.Zone.Z10, rrc.Motion.LINEAR))
-    r1.send_and_wait(rrc.MoveToFrame(place_frame, SPEED_PRECISE, rrc.Zone.FINE, rrc.Motion.LINEAR))
+    r1.send_and_wait(rrc.MoveToFrame(rot_frame, SPEED_APPROACH, rrc.Zone.FINE, rrc.Motion.LINEAR))
 
-    # 4. Settle, release
-    r1.send(rrc.WaitTime(2))
+    # 4. CSS descent: target sits 10mm below nominal place_frame so the
+    # gripper drives down into contact with the underlying surface (frame
+    # bars or previous layer). Only Z is compliant — Y/X stay stiff so the
+    # placement keeps its planned XY position; only the press depth yields.
+    #
+    # CSS params (RRC_CI_Rob.sys): [StiffnessNonSoftDir%, Stiffness%, Ramp%]
+    # Mode CSS_Z: Z is the single soft axis. Z stiffness 100% (vs pick's 50%
+    # on YZ) keeps the press tight — we want positioning accuracy on the
+    # rigid frame, not gentle conformance to a beam top.
+    if css_enabled:
+        r1.send_and_wait(rrc.CustomInstruction('r_RRC_CI_CSS', ['Define', 'CSS_Z'], [100, 100, 100]))
+        r1.send_and_wait(rrc.CustomInstruction('r_RRC_CI_CSS', ['On', 'AllowMove'], []))
+
+        place_press = place_frame.copy()
+        place_press.point.z -= 10
+        r1.send(rrc.MoveToFrame(place_press, SPEED_PRECISE, rrc.Zone.FINE, rrc.Motion.LINEAR))
+    else:
+        r1.send(rrc.MoveToFrame(place_frame, SPEED_PRECISE, rrc.Zone.FINE, rrc.Motion.LINEAR))
+
+    # 5. Settle, release
+    r1.send(rrc.WaitTime(0.5))
     gripper_open(r1, dry_run=dry_run, wait=True)
 
     # Detach beam geometry in simulation (stays at place position)
     if sim_beams:
         sim_beam_release(r1, dry_run=dry_run)
 
-    # 5. Deactivate gripper load (no more beam in gripper)
+    # Deactivate gripper load (no more beam in gripper)
     r1.send_and_wait(rrc.CustomInstruction('r_RRC_CI_GripLoad', ['Off'], []))
-    r1.send(rrc.WaitTime(1))
+    r1.send(rrc.WaitTime(0.5))
 
-    # 6. Retract vertically + back to approach + reset J6
+    # 6. Lift FIRST (CSS still on), THEN switch CSS off.
+    # If we switched CSS off at the press position, the controller would
+    # resolve the accumulated soft/stiff Z mismatch by driving down toward
+    # the path setpoint (~10mm below place_frame), pushing the open gripper
+    # into the just-released beam. Lifting upward with CSS on has no contact,
+    # so the actual position naturally catches up to the setpoint and the
+    # mismatch is gone by the time CSS goes off.
     place_retract = place_frame.copy()
     place_retract.point.z += 50
-    r1.send(rrc.MoveToFrame(place_retract, SPEED_APPROACH, rrc.Zone.Z1, rrc.Motion.LINEAR))
+    r1.send_and_wait(rrc.MoveToFrame(place_retract, SPEED_APPROACH, rrc.Zone.FINE, rrc.Motion.LINEAR))
+
+    if css_enabled:
+        r1.send_and_wait(rrc.CustomInstruction('r_RRC_CI_CSS', ['Off'], []))
+
+    # 7. Exit via approach + reset J6 (CSS off = stiff, full speed safe)
     r1.send_and_wait(rrc.MoveToFrame(approach_above_place, SPEED_NO_MEMBER, rrc.Zone.Z1, rrc.Motion.LINEAR))
 
     # Reset J6 to a neutral angle (avoid carrying wrist twist into next pick)

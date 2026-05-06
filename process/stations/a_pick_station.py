@@ -46,11 +46,24 @@ from _skills.WoodStorage.wood_storage import WoodStorage
 from globals import (
     ROBOT_NAME, TOOL_GRIPPER,
     SPEED_NO_MEMBER, SPEED_WITH_MEMBER, SPEED_APPROACH, SPEED_PRECISE,
+    BEAM_SECTION, WOOD_DENSITY,
 )
 from joint_positions import jp_pick
 
 # Duration in seconds for coordinated (track + robot) moves
 COORD_MOVE_TIME = 1
+
+
+def _beam_mass(beam_size):
+    """Mass (kg) of a beam, computed from beam_size string (length in mm).
+
+    Geometry: square cross-section BEAM_SECTION x BEAM_SECTION (mm), length
+    from beam_size, density WOOD_DENSITY (kg/m^3). Used to set the gripper
+    load dynamically per stock length instead of one fixed value.
+    """
+    length_mm = float(beam_size)
+    volume_m3 = (BEAM_SECTION / 1000.0) ** 2 * (length_mm / 1000.0)
+    return round(volume_m3 * WOOD_DENSITY, 3)
 
 
 def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True, sim_beams=False):
@@ -166,13 +179,16 @@ def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True,
     # would deform under the deeper press).
 
     if css_enabled:
-        # Define CSS profile: Y/Z axes at 50% softness, 100mm allowed deviation
+        # CSS params (RRC_CI_Rob.sys): [StiffnessNonSoftDir%, Stiffness%, Ramp%]
+        # Mode CSS_YZ -> Y and Z are the soft axes. 50% stiffness in soft
+        # direction = noticeably compliant so the gripper conforms to the
+        # 25mm beam top during the press without crushing it.
         r1.send_and_wait(rrc.CustomInstruction('r_RRC_CI_CSS', ['Define', 'CSS_YZ'], [50, 50, 100]))
         r1.send_and_wait(rrc.CustomInstruction('r_RRC_CI_CSS', ['On', 'AllowMove'], []))
 
         # Press 5mm down into the beam for secure contact (25mm beam section)
         pick_press = pick_frame.copy()
-        pick_press.point.z -= 5
+        pick_press.point.z -= 10
         r1.send(rrc.MoveToFrame(pick_press, SPEED_PRECISE, rrc.Zone.FINE, rrc.Motion.LINEAR))
 
     r1.send(rrc.WaitTime(0.5))
@@ -180,14 +196,28 @@ def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True,
     # Close the gripper
     gripper_close(r1, dry_run=dry_run, wait=True)
 
+    # Deactivate CSS while the robot is still at the press position. Switching
+    # CSS off later (after the retract) snaps the soft Y/Z axes back to the
+    # path setpoint with the accumulated soft/stiff mismatch in one step,
+    # which trips a servo-lag fault. Doing it here resolves the mismatch at
+    # rest, so the retract runs fully stiff.
+    if css_enabled:
+        r1.send_and_wait(rrc.CustomInstruction('r_RRC_CI_CSS', ['Off'], []))
+
     # Activate beam geometry in RobotStudio simulation (beam appears at TCP)
     if sim_beams:
         sim_beam_activate(r1, layer_idx, i, dry_run=dry_run)
 
-    # Define and activate gripper load (tells the controller the mass/inertia
-    # of the gripped beam so motion planning accounts for it)
-    # Parameters: mass=0.3kg (smaller for 25mm beam), CoG=(0,0,0.01), inertia matrix
-    r1.send(rrc.CustomInstruction('r_RRC_CI_GripLoad', ['Define'], [0.3, 0, 0, 0.01, 1, 0, 0, 0, 0, 0, 0]))
+    # Define and activate gripper load. The mass is computed from the actual
+    # beam length so motion planning has the right dynamics per stock size.
+    # CoG: the TCP sits in the middle of the beam, so the centre of mass is
+    # essentially at the TCP origin. ABB rejects cog = (0,0,0) (warning 41439
+    # "Undefinierte Last"), so we put a token 0.01mm in z — physically
+    # negligible. Inertia is left at zero (point-mass approx), fine at our
+    # speeds.
+    mass = _beam_mass(beam_size)
+    print(f"GripLoad: beam_size={beam_size}mm -> mass={mass}kg")
+    r1.send(rrc.CustomInstruction('r_RRC_CI_GripLoad', ['Define'], [mass, 0, 0, 0.01, 1, 0, 0, 0, 0, 0, 0]))
     r1.send(rrc.CustomInstruction('r_RRC_CI_GripLoad', ['On'], []))
 
     r1.send(rrc.WaitTime(0.5))
@@ -205,9 +235,6 @@ def a_pick_station(r1, data, i, *, layer_idx=0, dry_run=False, css_enabled=True,
 
     # 3. Linear up to retract_high
     r1.send(rrc.MoveToFrame(retract_high, SPEED_APPROACH, rrc.Zone.Z10, rrc.Motion.LINEAR))
-
-    if css_enabled:
-        r1.send_and_wait(rrc.CustomInstruction('r_RRC_CI_CSS', ['Off'], []))
 
     # 4. Exit to pre-approach offset (Y-150 to clear storage)
     exit_frame = pre_approach.copy()

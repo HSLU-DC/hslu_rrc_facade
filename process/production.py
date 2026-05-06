@@ -49,7 +49,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # the boosted values.
 #
 # DO NOT enable on the real cell. Sim-only.
-SIM_FAST = True
+SIM_FAST = False
 SIM_FAST_FACTOR = 4
 
 if SIM_FAST:
@@ -98,7 +98,7 @@ DO_PLACE = True
 CSS_ENABLED = True            # Cartesian Soft Servo for gentle gripping at pick
 SAW_ENABLED = True            # Circular saw on/off during cut moves
 GLUE_VALVE_ENABLED = True     # Glue valve pulsing during glue moves
-SIM_BEAMS = True              # BeamSimulator SmartComponent (virtual controller only)
+SIM_BEAMS = False              # BeamSimulator SmartComponent (virtual controller only)
 
 # Production range (LAYER / START_I / N_RUNS) is asked interactively at runtime.
 # Default = full layer 0; the operator can choose layer + element range.
@@ -526,7 +526,7 @@ def main(*, dry_run=False):
 
         if DO_PLACE:
             print("\n--- PLACE ---")
-            e_place_station.e_place_station(r1, DATA, i, layer_idx=ly, dry_run=dry_run, sim_beams=SIM_BEAMS)
+            e_place_station.e_place_station(r1, DATA, i, layer_idx=ly, dry_run=dry_run, css_enabled=CSS_ENABLED, sim_beams=SIM_BEAMS)
 
     # ==============================
     # 6. Cleanup
