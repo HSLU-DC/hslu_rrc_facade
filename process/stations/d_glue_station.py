@@ -83,7 +83,7 @@ def _build_offset_frames(start_frame):
 
 def _run_glue_line(r1, glue_frame, *, glue_valve_enabled=True,
                    line_length=15, y_step=7.5, num_lines=3,
-                   pulse_on_ms=20, pulse_off_ms=20, accel_dist=0):
+                   pulse_on_ms=10, pulse_off_ms=20, accel_dist=0):
     """Execute a zigzag fill of parallel glue lines around glue_frame.
 
     Lines run along the frame's local X. The pattern is centered on glue_frame:

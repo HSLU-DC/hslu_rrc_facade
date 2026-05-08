@@ -27,7 +27,13 @@ TOOL_GRIPPER = 't_HSLU_GripperZimmer'  # Zimmer pneumatic gripper
 # Each station has its own work object with a coordinate system calibrated
 # to the station's physical position. The pick station work objects are
 # defined per beam size in wood_storage.json (not here).
-W_OBJ_CUT = 'ob_HSLU_Cut'
+# Cut station has TWO wobjs depending on cut strategy:
+# - TOP for short stock (400/550) where the beam drops vertically through
+#   the blade; cut frames in this wobj reflect from-above geometry.
+# - BACK for long stock (750/1000) where the beam is fed horizontally from
+#   behind; cut frames in this wobj reflect from-behind geometry.
+W_OBJ_CUT_TOP = 'ob_HSLU_Cut_Top'
+W_OBJ_CUT_BACK = 'ob_HSLU_Cut_Back'
 W_OBJ_GLUE = 'ob_HSLU_Glue'
 W_OBJ_PLACE = 'ob_HSLU_Place'
 

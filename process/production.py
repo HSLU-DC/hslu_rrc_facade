@@ -91,8 +91,8 @@ except ImportError:
 # Station toggles — set to False to skip a station (robot still moves between stations)
 DO_PICK  = True
 DO_CUT   = True
-DO_GLUE  = False
-DO_PLACE = False
+DO_GLUE  = True
+DO_PLACE = True
 
 # Hardware toggles — False = dry-run motion without tool activation
 CSS_ENABLED = True            # Cartesian Soft Servo for gentle gripping at pick
@@ -103,7 +103,7 @@ SIM_BEAMS = False             # BeamSimulator SmartComponent (virtual controller
 # TEMP: skip the interactive lager-prompt at startup, just use whatever
 # counts are currently in wood_storage.json. Set back to False before any
 # proper production run.
-SKIP_LAGER_PROMPT = True
+SKIP_LAGER_PROMPT = False
 
 # Production range (LAYER / START_I / N_RUNS) is asked interactively at runtime.
 # Default = full layer 0; the operator can choose layer + element range.
@@ -465,7 +465,6 @@ def main(*, dry_run=False):
         if not check_wood_storage(DATA, production_plan):
             return
     elif SKIP_LAGER_PROMPT:
-        from _skills.WoodStorage.wood_storage import WoodStorage
         print("\n[TEMP] SKIP_LAGER_PROMPT=True — Lager-Prompt uebersprungen.")
         WoodStorage().print_status()
 
