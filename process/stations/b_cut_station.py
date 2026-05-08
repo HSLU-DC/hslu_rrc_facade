@@ -123,16 +123,27 @@ def _do_cut_sequence(r1, cut_frame, rotation_point=None, *, dry_run=False,
     if not skip_initial_move:
         r1.send(rrc.MoveToFrame(rotation_frame, SPEED_WITH_MEMBER, rrc.Zone.Z50, rrc.Motion.JOINT))
 
-    # Create an offset approach point (80mm above cut)
-    cut_approach = cut_frame.copy()
-    cut_approach.point.z += 70
-    r1.send(rrc.MoveToFrame(cut_approach, SPEED_WITH_MEMBER, rrc.Zone.Z10, rrc.Motion.LINEAR))
+    # Two-stage L-shaped approach behind the blade:
+    # 1) high and behind: Z+130, Y-150
+    # 2) drop down to cut height, still behind: Z+0, Y-150
+    # Then push forward (+Y) into cut_frame.
+    cut_approach_1 = cut_frame.copy()
+    cut_approach_1.point.z += 130
+    cut_approach_1.point.y -= 150
+    r1.send(rrc.MoveToFrame(cut_approach_1, SPEED_WITH_MEMBER, rrc.Zone.Z10, rrc.Motion.LINEAR))
+
+    cut_approach_2 = cut_frame.copy()
+    cut_approach_2.point.y -= 150
+    r1.send(rrc.MoveToFrame(cut_approach_2, SPEED_APPROACH, rrc.Zone.Z10, rrc.Motion.LINEAR))
 
     # --- ACTUAL CUTTING ---
 
     # Turn saw on (only if saw_on=True)
     if saw_on:
         r1.send_and_wait(rrc.CustomInstruction("r_HSLU_SawOn", [], []))
+
+    cut_frame_versatz = cut_frame.copy()
+    cut_frame_versatz.point.x -= 1
 
     r1.send(rrc.MoveToFrame(cut_frame, SPEED_CUT, rrc.Zone.FINE, rrc.Motion.LINEAR))
 

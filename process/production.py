@@ -91,8 +91,8 @@ except ImportError:
 # Station toggles — set to False to skip a station (robot still moves between stations)
 DO_PICK  = True
 DO_CUT   = True
-DO_GLUE  = True
-DO_PLACE = True
+DO_GLUE  = False
+DO_PLACE = False
 
 # Hardware toggles — False = dry-run motion without tool activation
 CSS_ENABLED = True            # Cartesian Soft Servo for gentle gripping at pick
