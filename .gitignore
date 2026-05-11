@@ -35,6 +35,10 @@ docker/data/
 
 # Claude
 .claude/
+CLAUDE.md
+
+# Gripper STL (drop manually, too large for git)
+design/hslu_rrc_facade_gripper_v2.stl
 
 # C# / .NET build output (BeamSimulator SmartComponent)
 bin/
