@@ -534,7 +534,7 @@ def main(*, dry_run=False):
 
         if DO_PLACE:
             print("\n--- PLACE ---")
-            e_place_station.e_place_station(r1, DATA, i, layer_idx=ly, dry_run=dry_run, css_enabled=CSS_ENABLED, sim_beams=SIM_BEAMS)
+            e_place_station.e_place_station(r1, DATA, i, layer_idx=ly, dry_run=dry_run, css_enabled=False, sim_beams=SIM_BEAMS)
 
     # ==============================
     # 6. Cleanup

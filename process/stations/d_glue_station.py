@@ -82,7 +82,7 @@ def _build_offset_frames(start_frame):
 
 
 def _run_glue_line(r1, glue_frame, *, glue_valve_enabled=True,
-                   line_length=15, y_step=7.5, num_lines=3,
+                   line_length=15, y_step=10, num_lines=2,
                    pulse_on_ms=10, pulse_off_ms=20, accel_dist=0):
     """Execute a zigzag fill of parallel glue lines around glue_frame.
 
@@ -93,8 +93,8 @@ def _run_glue_line(r1, glue_frame, *, glue_valve_enabled=True,
       - Direction alternates each line (zigzag); shifts in Y between lines run
         without glue.
 
-    Defaults give a 15x15 mm zigzag fill (3 lines at Y=-7.5/0/+7.5, each 15 mm)
-    on the 25x25 mm beam top, leaving a 5 mm margin on every side.
+    Defaults give a 15x10 mm zigzag fill (2 lines at Y=-5/+5, each 15 mm) on
+    the 25x25 mm beam top, leaving a 5 mm margin on every side.
 
     Args:
         glue_frame: TCP frame at the centre of the active glue area (beam
